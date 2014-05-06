@@ -25,17 +25,25 @@ namespace WTISC._2014.Data.Test
     [TestClass]
     public class AutorTest
     {
+        #region Private Members
+
         private MAutor managementTest;
-        const string NAME = "author test";
+        private const string NAME = "author test";
+
+        #endregion
+
+        #region Autor Tests
 
         [TestInitialize]
-        public void Initialize()
+        [Description("Initialize test")]
+        private void Initialize()
         {
             this.managementTest = new MAutor();
         }
 
         [TestCleanup]
-        public void RestartDB()
+        [Description("Delete database values")]
+        private void RestartDB()
         {
             BooksEntities resetEntities = new BooksEntities();
             resetEntities.Database.ExecuteSqlCommand("DELETE [Livro]");
@@ -43,6 +51,7 @@ namespace WTISC._2014.Data.Test
         }
 
         [TestMethod]
+        [Description("Create an author")]
         public void NewAuthorTest()
         {
             #region Case 1: Create a new author
@@ -55,6 +64,7 @@ namespace WTISC._2014.Data.Test
 
         [TestMethod]
         [ExpectedException(typeof(AuthorException), "The author already exists!")]
+        [Description("Create an author with already existing name")]
         public void NewAutorException_NameTest()
         {
             #region Case 1: Create a author with already existing name
@@ -68,6 +78,7 @@ namespace WTISC._2014.Data.Test
 
         [TestMethod]
         [ExpectedException(typeof(AuthorException), "The name can't be empty!")]
+        [Description("Create a author without name")]
         public void NewAutorException_EmptyNameTest()
         {
             #region Case 1: Create a author without name
@@ -78,6 +89,7 @@ namespace WTISC._2014.Data.Test
         }
 
         [TestMethod]
+        [Description("Find author by name")]
         public void FindAuthorByNameTest()
         {
             #region Case 1: Get a created author
@@ -100,6 +112,7 @@ namespace WTISC._2014.Data.Test
         }
 
         [TestMethod]
+        [Description("Alter author's name")]
         public void UpdateAuthorTest()
         {
             #region Case 1: Update the author's informations
@@ -119,6 +132,7 @@ namespace WTISC._2014.Data.Test
 
         [TestMethod]
         [ExpectedException(typeof(AuthorException), "The author already exists!")]
+        [Description("Alter the author's name")]
         public void UpdateAuthorExceptionTest()
         {
             #region Case 1: Alter author's name for already existing name
@@ -130,6 +144,7 @@ namespace WTISC._2014.Data.Test
         }
 
         [TestMethod]
+        [Description("Alter the author's name with an already existing name")]
         public void FindAllAuthorsTest()
         {
             #region Case 1: Get all authors
@@ -148,6 +163,7 @@ namespace WTISC._2014.Data.Test
             #endregion
         }
 
+        #endregion
 
         #region Private Methods
 
