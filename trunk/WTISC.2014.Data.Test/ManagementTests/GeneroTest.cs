@@ -25,18 +25,26 @@ namespace WTISC._2014.Data.Test.ManagementTests
     [TestClass]
     public class GeneroTest
     {
+        #region Private Members
+
         private MGenero managementTest;
-        const string NAME = "gender test";
-        const string DESCRIPTION = "gender description test";
+        private const string NAME = "gender test";
+        private const string DESCRIPTION = "gender description test";
+
+        #endregion
+
+        #region Genero Tests
 
         [TestInitialize]
-        public void Initialize()
+        [Description("Initialize test")]
+        private void Initialize()
         {
             this.managementTest = new MGenero();
         }
 
         [TestCleanup]
-        public void RestartDB()
+        [Description("Delete database values")]
+        private void RestartDB()
         {
             BooksEntities resetEntities = new BooksEntities();
             resetEntities.Database.ExecuteSqlCommand("DELETE [Livro]");
@@ -44,11 +52,12 @@ namespace WTISC._2014.Data.Test.ManagementTests
         }
 
         [TestMethod]
+        [Description("Create a gender")]
         public void NewGenderTest()
         {
             #region Case 1: Create a new Gender
 
-            Genero genderTest = this.managementTest.NewGender(NAME,DESCRIPTION);
+            Genero genderTest = this.managementTest.NewGender(NAME, DESCRIPTION);
             Assert.AreEqual(NAME, genderTest.Nome);
 
             #endregion
@@ -56,6 +65,7 @@ namespace WTISC._2014.Data.Test.ManagementTests
 
         [TestMethod]
         [ExpectedException(typeof(GenderException), "The gender already exists!")]
+        [Description("Create a gender with already existing name")]
         public void NewGenderException_NameTest()
         {
             #region Case 1: Create a gender with already existing name
@@ -68,21 +78,23 @@ namespace WTISC._2014.Data.Test.ManagementTests
 
         [TestMethod]
         [ExpectedException(typeof(GenderException), "The name can't be empty!")]
+        [Description("Create a gender without name")]
         public void NewGenderException_EmptyNameTest()
         {
             #region Case 1: Create a gender without name
 
-            this.managementTest.NewGender(String.Empty,DESCRIPTION);
+            this.managementTest.NewGender(String.Empty, DESCRIPTION);
 
             #endregion
         }
 
         [TestMethod]
+        [Description("Find gender by name")]
         public void FindGenderByNameTest()
         {
             #region Case 1: Get a created gender
 
-            Genero expected = this.managementTest.NewGender(NAME,DESCRIPTION);
+            Genero expected = this.managementTest.NewGender(NAME, DESCRIPTION);
             Genero actual = this.managementTest.FindGenderByName(NAME);
 
             Assert.AreEqual(expected, actual);
@@ -100,6 +112,7 @@ namespace WTISC._2014.Data.Test.ManagementTests
         }
 
         [TestMethod]
+        [Description("Find all genders on the database")]
         public void FindAllGendersTest()
         {
             #region Case 1: Get all genders
@@ -108,7 +121,7 @@ namespace WTISC._2014.Data.Test.ManagementTests
 
             foreach (Genero gender in expected)
             {
-                gender.Id = this.managementTest.NewGender(gender.Nome,gender.Descricao).Id;
+                gender.Id = this.managementTest.NewGender(gender.Nome, gender.Descricao).Id;
             }
 
             List<Genero> actual = this.managementTest.FindAll();
@@ -117,6 +130,8 @@ namespace WTISC._2014.Data.Test.ManagementTests
 
             #endregion
         }
+
+        #endregion
 
         #region Private Methods
 

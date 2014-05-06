@@ -25,15 +25,22 @@ namespace WTISC._2014.Data.Test.ManagementTests
     [TestClass]
     public class LivroTest
     {
+        #region Private Members
+
         private MLivro managementTest;
-        const string TITLE = "title test";
-        const string DESCRIPTION = "book description test";
-        const int ISBN = 123456789;
+        private const string TITLE = "title test";
+        private const string DESCRIPTION = "book description test";
+        private const int ISBN = 123456789;
         private int idGender;
         private int idAuthor;
 
+        #endregion
+
+        #region Livro Tests
+
         [TestInitialize]
-        public void Initialize()
+        [Description("Initialize test")]
+        private void Initialize()
         {
             this.managementTest = new MLivro();
             MAutor mAuthor = new MAutor();
@@ -43,7 +50,8 @@ namespace WTISC._2014.Data.Test.ManagementTests
         }
 
         [TestCleanup]
-        public void RestartDB()
+        [Description("Delete database values")]
+        private void RestartDB()
         {
             BooksEntities resetEntities = new BooksEntities();
             resetEntities.Database.ExecuteSqlCommand("DELETE [Livro]");
@@ -52,6 +60,7 @@ namespace WTISC._2014.Data.Test.ManagementTests
         }
 
         [TestMethod]
+        [Description("Create a book")]
         public void NewBookTest()
         {
             #region Case 1: Create a new Book
@@ -72,6 +81,7 @@ namespace WTISC._2014.Data.Test.ManagementTests
 
         [TestMethod]
         [ExpectedException(typeof(BookException), "A book with the same ISBN code already exists!")]
+        [Description("Create a book with a already existing  ISBN")]
         public void NewBookException_ISBNTest()
         {
             #region Case 1: Create a book with already existing ISBN
@@ -84,6 +94,7 @@ namespace WTISC._2014.Data.Test.ManagementTests
 
         [TestMethod]
         [ExpectedException(typeof(BookException), "The title can't be empty!")]
+        [Description("Create a book without title")]
         public void NewBookException_EmptyTitleTest()
         {
             #region Case 1: Create a book without title
@@ -94,6 +105,7 @@ namespace WTISC._2014.Data.Test.ManagementTests
         }
 
         [TestMethod]
+        [Description("Find a book by ISBN")]
         public void FindBookByISBNTest()
         {
             #region Case 1: Find a book by the ISBN code
@@ -122,6 +134,7 @@ namespace WTISC._2014.Data.Test.ManagementTests
         }
 
         [TestMethod]
+        [Description("Find a book by title")]
         public void FindBookByTitleTest()
         {
             #region Case 1: Find a book by the title
@@ -150,6 +163,7 @@ namespace WTISC._2014.Data.Test.ManagementTests
         }
 
         [TestMethod]
+        [Description("Alter book values")]
         public void UpdateBookTeste()
         {
             #region Case 1: Alter a book
@@ -173,6 +187,7 @@ namespace WTISC._2014.Data.Test.ManagementTests
     
         [TestMethod]
         [ExpectedException(typeof(BookException),"The title can't be empty!")]
+        [Description("Alter book settin an empty title")]
         public void UpdateBookException_EmptyTitleTest()
         {
             #region Case 1: Alter a book without title
@@ -194,6 +209,7 @@ namespace WTISC._2014.Data.Test.ManagementTests
         }
 
         [TestMethod]
+        [Description("Delete the book")]
         public void DeleteBookTest()
         {
             #region Case 1: Delete a book
@@ -217,12 +233,14 @@ namespace WTISC._2014.Data.Test.ManagementTests
 
         [TestMethod]
         [ExpectedException(typeof(BookException), "Book not found!")]
+        [Description("Find an inexistent book")]
         public void DeleteBookException_NoResultTest()
         {
             this.managementTest.DeleteBook(958575);
         }
 
         [TestMethod]
+        [Description("Change the value 'Lido'")]
         public void ReadBookTest()
         {
             #region Case 1: Read book
@@ -260,6 +278,7 @@ namespace WTISC._2014.Data.Test.ManagementTests
 
         [TestMethod]
         [ExpectedException(typeof(BookException), "Book not found!")]
+        [Description("Read an inexistent book")]
         public void ReadBookExceptionTest()
         {
             #region Case 1: Book not found
@@ -281,6 +300,7 @@ namespace WTISC._2014.Data.Test.ManagementTests
         }
 
         [TestMethod]
+        [Description("Find all the books")]
         public void FindAllBooksTest()
         {
             #region Case 1: Get all genders
@@ -298,6 +318,8 @@ namespace WTISC._2014.Data.Test.ManagementTests
 
             #endregion
         }
+
+        #endregion
 
         #region Private Methods
 
