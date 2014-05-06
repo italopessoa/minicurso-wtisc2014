@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>WTISC.2014.Data.Test</name>
+    </assembly>
+    <members>
+        <member name="M:WTISC._2014.Data.Test.AutorTest.GenerateAuthors(System.Int32)">
+            <summary>
+            Generate Autor items 
+            </summary>
+            <param name="count">Number of items</param>
+            <returns>List of Autor</returns>
+        </member>
+        <member name="M:WTISC._2014.Data.Test.ManagementTests.GeneroTest.GenerateGenders(System.Int32)">
+            <summary>
+            Generate Genero items 
+            </summary>
+            <param name="count">Number of items</param>
+            <returns>List of Genero</returns>
+        </member>
+        <member name="M:WTISC._2014.Data.Test.ManagementTests.LivroTest.GenerateLivros(System.Int32)">
+            <summary>
+            Generate Livro items 
+            </summary>
+            <param name="count">Number of items</param>
+            <returns>List of Livro</returns>
+        </member>
+    </members>
+</doc>
