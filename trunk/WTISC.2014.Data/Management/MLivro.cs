@@ -49,37 +49,29 @@ namespace WTISC._2014.Data.Management
         /// <returns>New Book</returns>
         public Livro NewBook(string titulo, string resumo, int ISBN, int idGenero, int idAutor)
         {
-
             if (!string.IsNullOrEmpty(titulo))
             {
-                if (this.FindBookByTitle(titulo) == null)
+                if (this.FindBookByISBN(ISBN) == null)
                 {
-                    if (this.FindBookByISBN(ISBN) == null)
-                    {
-                        Livro livro = new Livro();
-                        livro.Titulo = titulo;
-                        livro.Resumo = resumo;
-                        livro.ISBN = ISBN;
-                        livro.IdGenero = idGenero;
-                        livro.IdAutor = idAutor;
-                        this.entities.Livro.Add(livro);
-                        this.entities.SaveChanges();
+                    Livro livro = new Livro();
+                    livro.Titulo = titulo;
+                    livro.Resumo = resumo;
+                    livro.ISBN = ISBN;
+                    livro.IdGenero = idGenero;
+                    livro.IdAutor = idAutor;
+                    this.entities.Livro.Add(livro);
+                    this.entities.SaveChanges();
 
-                        return livro;
-                    }
-                    else
-                    {
-                        throw new BookException();
-                    }
+                    return livro;
                 }
                 else
                 {
-                    throw new BookException();
+                    throw new BookException("A book with the same ISBN code already exists!");
                 }
             }
             else
             {
-                throw new BookException();
+                throw new BookException("The title can't be empty!");
             }
 
         }
@@ -91,7 +83,7 @@ namespace WTISC._2014.Data.Management
         /// <returns>A Book</returns>
         public Livro FindBookByISBN(int ISBN)
         {
-            return this.entities.Livro.FirstOrDefault<Livro>(l => l.ISBN == 101010101);
+            return this.entities.Livro.FirstOrDefault<Livro>(l => l.ISBN == ISBN);
         }
 
         /// <summary>
@@ -113,27 +105,21 @@ namespace WTISC._2014.Data.Management
         {
             if (!string.IsNullOrEmpty(book.Titulo))
             {
-                if (this.FindBookByTitle(book.Titulo) == null)
-                {
-                    Livro oldBook = this.FindBookByISBN(book.ISBN);
-                    oldBook.Titulo = book.Titulo;
-                    oldBook.Resumo = book.Resumo;
-                    oldBook.IdGenero = book.IdGenero;
-                    oldBook.IdAutor = book.IdAutor;
-                    oldBook.Capa = book.Capa;
-                    this.entities.SaveChanges();
-                }
-                else
-                {
-                    throw new BookException();
-                }
+                Livro oldBook = this.FindBookByISBN(book.ISBN);
+                oldBook.Titulo = book.Titulo;
+                oldBook.Resumo = book.Resumo;
+                oldBook.IdGenero = book.IdGenero;
+                oldBook.IdAutor = book.IdAutor;
+                oldBook.Capa = book.Capa;
+                this.entities.SaveChanges();
+
             }
             else
             {
-                throw new BookException();
+                throw new BookException("The title can't be empty!");
             }
         }
-    
+
         /// <summary>
         /// Delete a book
         /// </summary>
@@ -149,7 +135,7 @@ namespace WTISC._2014.Data.Management
             }
             else
             {
-                throw new BookException();
+                throw new BookException("Book not found!");
             }
         }
 
@@ -168,8 +154,14 @@ namespace WTISC._2014.Data.Management
             }
             else
             {
-                throw new BookException();
+                throw new BookException("Book not found!");
             }
         }
+    
+        public List<Livro> FindAll()
+        {
+            return this.entities.Livro.ToList<Livro>();
+        }
+    
     }
 }

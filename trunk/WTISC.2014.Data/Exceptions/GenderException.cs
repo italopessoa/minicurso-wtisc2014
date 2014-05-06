@@ -21,16 +21,31 @@ using System.Text;
 
 namespace WTISC._2014.Data.Exceptions
 {
-    class GenderException: SystemException
+    /// <summary>
+    /// Genero exception class
+    /// </summary>
+    public class GenderException : SystemException
     {
+        /// <summary>
+        /// Initialize a new instance of <c>WTISC._2014.Data.Exceptions.GenderException</c>
+        /// </summary>
         public GenderException()
         { }
 
+        /// <summary>
+        /// Initialize a new instance of <c>WTISC._2014.Data.Exceptions.GenderException</c>
+        /// </summary>
+        /// <param name="message">Exception message</param>
         public GenderException(string message)
             : base(message)
         {
         }
 
+        /// <summary>
+        /// Initialize a new instance of <c>WTISC._2014.Data.Exceptions.GenderException</c>
+        /// </summary>
+        /// <param name="message">Message</param>
+        /// <param name="innerException">Inner Exception</param>
         public GenderException(string message, Exception innerException)
             : base(message, innerException)
         {

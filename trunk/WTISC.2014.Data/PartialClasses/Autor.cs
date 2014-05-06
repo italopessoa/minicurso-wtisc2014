@@ -19,36 +19,33 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace WTISC._2014.Data.Exceptions
+///partial classes must have the same namespace
+namespace WTISC._2014.Data
 {
     /// <summary>
-    /// Livro exception class
+    /// Partial class to manual code
     /// </summary>
-    public class BookException : SystemException
+    public partial class Autor
     {
         /// <summary>
-        /// Initialize a new instance of <c>WTISC._2014.Data.Exceptions.BookException</c>
+        /// Compare instances
         /// </summary>
-        public BookException()
-        { }
-
-        /// <summary>
-        /// Initialize a new instance of <c>WTISC._2014.Data.Exceptions.BookException</c>
-        /// </summary>
-        /// <param name="message">Message</param>
-        public BookException(string message)
-            : base(message)
+        /// <param name="obj">Instance to compare</param>
+        /// <returns>True or False</returns>
+        public override bool Equals(object obj)
         {
-        }
-
-        /// <summary>
-        /// Initialize a new instance of <c>WTISC._2014.Data.Exceptions.BookException</c>
-        /// </summary>
-        /// <param name="message">Message</param>
-        /// <param name="innerException">Inner Exception</param>
-        public BookException(string message, Exception innerException)
-            : base(message, innerException)
-        {
+            if (obj == null)
+            {
+                return false;
+            }
+            else if (obj is Autor)
+            {
+                return this.Id == (obj as Autor).Id;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

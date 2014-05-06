@@ -48,11 +48,11 @@ namespace WTISC._2014.Data.Management
         {
             if (!string.IsNullOrEmpty(name))
             {
-                if (this.FindGenderByName(name) != null)
+                if (this.FindGenderByName(name) == null)
                 {
                     Genero genero = new Genero();
-                    genero.Nome = "Novo Gênero";
-                    genero.Descricao = "Descrição de um novo gênero";
+                    genero.Nome = name;
+                    genero.Descricao = description;
 
                     this.entities.Genero.Add(genero);
                     this.entities.SaveChanges();
@@ -61,7 +61,7 @@ namespace WTISC._2014.Data.Management
                 }
                 else
                 {
-                    throw new GenderException("The name can't be empty!");
+                    throw new GenderException("The gender already exists!");
                 }
             }
             else
@@ -77,6 +77,7 @@ namespace WTISC._2014.Data.Management
         /// <returns></returns>
         public Genero FindGenderByName(string name)
         {
+            Genero asd = this.entities.Genero.FirstOrDefault<Genero>(g => g.Nome.Equals(name));
             return this.entities.Genero.FirstOrDefault<Genero>(g => g.Nome.Equals(name));
         }
 
