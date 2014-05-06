@@ -80,6 +80,9 @@
     <Compile Include="Management\MAutor.cs" />
     <Compile Include="Management\MGenero.cs" />
     <Compile Include="Management\MLivro.cs" />
+    <Compile Include="PartialClasses\Autor.cs" />
+    <Compile Include="PartialClasses\Genero.cs" />
+    <Compile Include="PartialClasses\Livro.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

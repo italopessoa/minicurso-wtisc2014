@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<OrderedTest name="autor_orderedtest" storage="e:\svn\wtisc2014\trunk\wtisc.2014.data.test\orderedtests\autor_orderedtest.orderedtest" id="b7b09109-95c5-4c62-be10-ba502d4f6ca6" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <TestLinks>
+    <TestLink id="0dfcf15f-0f70-3eb8-5504-fd9fff7c4979" name="NewAuthorTest" storage="..\bin\debug\wtisc.2014.data.test.dll" type="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestElement, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.ObjectModel, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <TestLink id="031cc1d8-1716-76c4-5e7c-d06bd009f43d" name="FindAuthorByNameTest" storage="..\bin\debug\wtisc.2014.data.test.dll" type="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestElement, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.ObjectModel, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <TestLink id="e262f2e9-d0fb-3dcf-d27c-91ac855c692b" name="NewAutorException_EmptyNameTest" storage="..\bin\debug\wtisc.2014.data.test.dll" type="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestElement, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.ObjectModel, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <TestLink id="da6a392b-2697-a28f-5d9f-59bd4c3572dd" name="NewAutorException_NameTest" storage="..\bin\debug\wtisc.2014.data.test.dll" type="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestElement, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.ObjectModel, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <TestLink id="031cc1d8-1716-76c4-5e7c-d06bd009f43d" name="FindAuthorByNameTest" storage="..\bin\debug\wtisc.2014.data.test.dll" type="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestElement, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.ObjectModel, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <TestLink id="ed5e3664-cab3-1407-4fcb-8fe5d8cb965a" name="FindAllAuthorsTest" storage="..\bin\debug\wtisc.2014.data.test.dll" type="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestElement, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.ObjectModel, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  </TestLinks>
+</OrderedTest>

@@ -57,7 +57,7 @@ namespace WTISC._2014.Data.Management
                 }
                 else
                 {
-                    throw new AuthorException();
+                    throw new AuthorException("The author already exists!");
                 }
             }
             else throw new AuthorException("The name can't be empty!");
@@ -88,8 +88,17 @@ namespace WTISC._2014.Data.Management
             }
             else
             {
-                throw new AuthorException();
+                throw new AuthorException("The author already exists!");
             }
+        }
+    
+        /// <summary>
+        /// Return all the authors
+        /// </summary>
+        /// <returns>List of authors</returns>
+        public List<Autor> FindAll()
+        {
+            return this.entities.Autor.ToList<Autor>();
         }
     }
 }

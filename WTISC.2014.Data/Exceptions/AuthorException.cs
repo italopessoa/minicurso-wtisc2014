@@ -21,16 +21,31 @@ using System.Text;
 
 namespace WTISC._2014.Data.Exceptions
 {
+    /// <summary>
+    /// Autor exception class
+    /// </summary>
     public class AuthorException : SystemException
     {
+        /// <summary>
+        /// Initialize a new instance of <c>WTISC._2014.Data.Exceptions.AuthorException</c>
+        /// </summary>
         public AuthorException()
         { }
 
+        /// <summary>
+        /// Initialize a new instance of <c>WTISC._2014.Data.Exceptions.AuthorException</c>
+        /// </summary>
+        /// <param name="message">Message</param>
         public AuthorException(string message)
             : base(message)
         {
         }
 
+        /// <summary>
+        /// Initialize a new instance of <c>WTISC._2014.Data.Exceptions.AuthorException</c>
+        /// </summary>
+        /// <param name="message">Message</param>
+        /// <param name="innerException">Inner Exception</param>
         public AuthorException(string message, Exception innerException)
             : base(message, innerException)
         {
