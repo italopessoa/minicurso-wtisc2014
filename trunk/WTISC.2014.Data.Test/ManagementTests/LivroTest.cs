@@ -40,7 +40,7 @@ namespace WTISC._2014.Data.Test.ManagementTests
 
         [TestInitialize]
         [Description("Initialize test")]
-        private void Initialize()
+        public void Initialize()
         {
             this.managementTest = new MLivro();
             MAutor mAuthor = new MAutor();
@@ -51,7 +51,7 @@ namespace WTISC._2014.Data.Test.ManagementTests
 
         [TestCleanup]
         [Description("Delete database values")]
-        private void RestartDB()
+        public void RestartDB()
         {
             BooksEntities resetEntities = new BooksEntities();
             resetEntities.Database.ExecuteSqlCommand("DELETE [Livro]");
@@ -72,7 +72,7 @@ namespace WTISC._2014.Data.Test.ManagementTests
             expected.IdGenero = idGender;
             expected.ISBN = ISBN;
 
-            Livro actual = this.managementTest.NewBook(TITLE, DESCRIPTION, ISBN, idGender, idAuthor);
+            Livro actual = this.managementTest.NewBook(TITLE, DESCRIPTION, ISBN, idGender, idAuthor,false,null);
 
             Assert.AreEqual(expected, actual);
 
@@ -86,8 +86,8 @@ namespace WTISC._2014.Data.Test.ManagementTests
         {
             #region Case 1: Create a book with already existing ISBN
 
-            this.managementTest.NewBook(TITLE + "qwe", DESCRIPTION + "qwe", ISBN, idGender, idAuthor);
-            this.managementTest.NewBook(TITLE, DESCRIPTION, ISBN, idGender, idAuthor);
+            this.managementTest.NewBook(TITLE + "qwe", DESCRIPTION + "qwe", ISBN, idGender, idAuthor,true,null);
+            this.managementTest.NewBook(TITLE, DESCRIPTION, ISBN, idGender, idAuthor,true,null);
 
             #endregion
         }
@@ -99,7 +99,7 @@ namespace WTISC._2014.Data.Test.ManagementTests
         {
             #region Case 1: Create a book without title
 
-            this.managementTest.NewBook(string.Empty, DESCRIPTION + "qwe", ISBN, idGender, idAuthor);
+            this.managementTest.NewBook(string.Empty, DESCRIPTION + "qwe", ISBN, idGender, idAuthor,true,null);
 
             #endregion
         }
@@ -117,7 +117,7 @@ namespace WTISC._2014.Data.Test.ManagementTests
             expected.IdGenero = idGender;
             expected.ISBN = ISBN;
 
-            this.managementTest.NewBook(TITLE, DESCRIPTION, ISBN, idGender, idAuthor);
+            this.managementTest.NewBook(TITLE, DESCRIPTION, ISBN, idGender, idAuthor, true, null);
             Livro actual = this.managementTest.FindBookByISBN(ISBN);
             Assert.AreEqual(expected, actual);
 
@@ -128,7 +128,7 @@ namespace WTISC._2014.Data.Test.ManagementTests
             expected = null;
 
             actual = this.managementTest.FindBookByISBN(0987654321);
-            Assert.AreEqual(expected, actual);
+            Assert.IsNull(actual);
 
             #endregion
         }
@@ -146,7 +146,7 @@ namespace WTISC._2014.Data.Test.ManagementTests
             expected.IdGenero = idGender;
             expected.ISBN = ISBN;
 
-            this.managementTest.NewBook(TITLE, DESCRIPTION, ISBN, idGender, idAuthor);
+            this.managementTest.NewBook(TITLE, DESCRIPTION, ISBN, idGender, idAuthor, true, null);
             Livro actual = this.managementTest.FindBookByTitle(TITLE);
             Assert.AreEqual(expected, actual);
 
@@ -157,7 +157,7 @@ namespace WTISC._2014.Data.Test.ManagementTests
             expected = null;
 
             actual = this.managementTest.FindBookByTitle("invalide title");
-            Assert.AreEqual(expected, actual);
+            Assert.IsNull(actual);
 
             #endregion
         }
@@ -175,7 +175,7 @@ namespace WTISC._2014.Data.Test.ManagementTests
             expected.IdGenero = idGender;
             expected.ISBN = ISBN;
 
-            expected = this.managementTest.NewBook(TITLE, DESCRIPTION, ISBN, idGender, idAuthor);
+            expected = this.managementTest.NewBook(TITLE, DESCRIPTION, ISBN, idGender, idAuthor, true, null);
 
             expected.Titulo = "NEW TITLE";
 
@@ -199,7 +199,7 @@ namespace WTISC._2014.Data.Test.ManagementTests
             book.IdGenero = idGender;
             book.ISBN = ISBN;
 
-            book = this.managementTest.NewBook(TITLE, DESCRIPTION, ISBN, idGender, idAuthor);
+            book = this.managementTest.NewBook(TITLE, DESCRIPTION, ISBN, idGender, idAuthor, true, null);
 
             book.Titulo = String.Empty; ;
 
@@ -221,12 +221,12 @@ namespace WTISC._2014.Data.Test.ManagementTests
             book.IdGenero = idGender;
             book.ISBN = ISBN;
 
-            book = this.managementTest.NewBook(TITLE, DESCRIPTION, ISBN, idGender, idAuthor);
+            book = this.managementTest.NewBook(TITLE, DESCRIPTION, ISBN, idGender, idAuthor, true, null);
 
             this.managementTest.DeleteBook(book.ISBN);
 
             Livro actual = this.managementTest.FindBookByISBN(book.ISBN);
-            Assert.AreEqual(null, actual);
+            Assert.IsNull(actual);
 
             #endregion
         }
@@ -243,7 +243,7 @@ namespace WTISC._2014.Data.Test.ManagementTests
         [Description("Change the value 'Lido'")]
         public void ReadBookTest()
         {
-            #region Case 1: Read book
+            #region Case 1: Unread book
 
             bool expected = true;
             Livro book = new Livro();
@@ -252,20 +252,22 @@ namespace WTISC._2014.Data.Test.ManagementTests
             book.IdAutor = idAuthor;
             book.IdGenero = idGender;
             book.ISBN = ISBN;
+            book.Lido = true;
+            book.Capa = null;
 
-            book = this.managementTest.NewBook(TITLE, DESCRIPTION, ISBN, idGender, idAuthor);
+            book = this.managementTest.NewBook(TITLE, DESCRIPTION, ISBN, idGender, idAuthor, true, null);
 
             this.managementTest.ReadBook(book.ISBN);
 
             book = this.managementTest.FindBookByISBN(book.ISBN);
-            
-            Assert.AreEqual(expected, book.Lido);
+
+            Assert.AreEqual(false, book.Lido);
 
             #endregion
 
-            #region Case 2: Unread book
+            #region Case 2: Read book
 
-            expected = false;
+            expected = true;
 
             this.managementTest.ReadBook(book.ISBN);
 
@@ -290,7 +292,7 @@ namespace WTISC._2014.Data.Test.ManagementTests
             book.IdGenero = idGender;
             book.ISBN = ISBN;
 
-            book = this.managementTest.NewBook(TITLE, DESCRIPTION, ISBN, idGender, idAuthor);
+            book = this.managementTest.NewBook(TITLE, DESCRIPTION, ISBN, idGender, idAuthor, true, null);
 
             this.managementTest.ReadBook(0000);
 
@@ -309,7 +311,7 @@ namespace WTISC._2014.Data.Test.ManagementTests
 
             foreach (Livro livro in expected)
             {
-                this.managementTest.NewBook(livro.Titulo, livro.Resumo, livro.ISBN, livro.IdGenero, livro.IdAutor);
+                this.managementTest.NewBook(livro.Titulo, livro.Resumo, livro.ISBN, livro.IdGenero, livro.IdAutor, true, null);
             }
 
             List<Livro> actual = this.managementTest.FindAll();

@@ -45,9 +45,10 @@ namespace WTISC._2014.Data.Management
         /// <param name="ISBN">International Standard Book Number</param>
         /// <param name="idGenero">Gender of the book</param>
         /// <param name="idAutor">Author of the book</param>
+        /// /// <param name="lido">Indicates if the book was already read</param>
         /// <exception cref="WTISC._2014.Data.Exceptions.BookException"></exception>
         /// <returns>New Book</returns>
-        public Livro NewBook(string titulo, string resumo, int ISBN, int idGenero, int idAutor)
+        public Livro NewBook(string titulo, string resumo, int ISBN, int idGenero, int idAutor, bool lido,byte[] capa)
         {
             if (!string.IsNullOrEmpty(titulo))
             {
@@ -59,6 +60,8 @@ namespace WTISC._2014.Data.Management
                     livro.ISBN = ISBN;
                     livro.IdGenero = idGenero;
                     livro.IdAutor = idAutor;
+                    livro.Lido = lido;
+                    livro.Capa = capa;
                     this.entities.Livro.Add(livro);
                     this.entities.SaveChanges();
 
@@ -83,7 +86,8 @@ namespace WTISC._2014.Data.Management
         /// <returns>A Book</returns>
         public Livro FindBookByISBN(int ISBN)
         {
-            return this.entities.Livro.FirstOrDefault<Livro>(l => l.ISBN == ISBN);
+            return this.entities.Livro.Include("Autor")
+                .Include("Genero").FirstOrDefault<Livro>(l => l.ISBN == ISBN);
         }
 
         /// <summary>
@@ -158,10 +162,13 @@ namespace WTISC._2014.Data.Management
             }
         }
     
+        /// <summary>
+        /// Find all books
+        /// </summary>
+        /// <returns>List of Livro</returns>
         public List<Livro> FindAll()
         {
             return this.entities.Livro.ToList<Livro>();
         }
-    
     }
 }

@@ -42,7 +42,7 @@ namespace WTISC._2014.Data.Management
         /// </summary>
         /// <param name="name">The name of the gender</param>
         /// <param name="description">The description of the gender</param>
-        /// <exception cref="WTISC._2014.Data.Exceptions.AuthorException"></exception>
+        /// <exception cref="WTISC._2014.Data.Exceptions.GenderException"></exception>
         /// <returns>New Gender</returns>
         public Genero NewGender(string name, string description)
         {
@@ -74,7 +74,7 @@ namespace WTISC._2014.Data.Management
         /// Find a gender by name
         /// </summary>
         /// <param name="name">The name of the gender</param>
-        /// <returns></returns>
+        /// <returns>Gender</returns>
         public Genero FindGenderByName(string name)
         {
             Genero asd = this.entities.Genero.FirstOrDefault<Genero>(g => g.Nome.Equals(name));
@@ -88,6 +88,44 @@ namespace WTISC._2014.Data.Management
         public List<Genero> FindAll()
         {
             return this.entities.Genero.ToList<Genero>();
+        }
+
+        /// <summary>
+        /// Delete the Gender by ID
+        /// </summary>
+        /// <param name="id"></param>
+        public void Delete(int id)
+        {
+            Genero ge = this.entities.Genero.FirstOrDefault<Genero>(g => g.Id == id);
+
+            if (ge != null)
+            {
+                this.entities.Genero.Remove(ge);
+                this.entities.SaveChanges();
+            }
+        }
+
+        /// <summary>
+        /// Find Gender by ID
+        /// </summary>
+        /// <param name="id">Gender ID</param>
+        /// <returns>Genero</returns>
+        public Genero FindGenderById(int id)
+        {
+            return this.entities.Genero.FirstOrDefault<Genero>(g => g.Id == id);
+        }
+        
+        /// <summary>
+        /// Alter the Gender
+        /// </summary>
+        /// <param name="gender">Gender to Update</param>
+        public void Update(Genero gender)
+        {
+            Genero atual = this.FindGenderById(gender.Id);
+            atual.Nome = gender.Nome;
+            atual.Descricao = gender.Descricao;
+
+            this.entities.SaveChanges();
         }
     }
 }

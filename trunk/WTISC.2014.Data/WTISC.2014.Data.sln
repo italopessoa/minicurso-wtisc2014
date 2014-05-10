@@ -7,6 +7,29 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WTISC.2014.Data", "WTISC.20
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WTISC.2014.Data.Test", "..\WTISC.2014.Data.Test\WTISC.2014.Data.Test.csproj", "{58EEC7B4-78C9-4342-9E7D-C4BE2B96F0AD}"
 EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "WTISC.WebSite", "http://localhost:59688", "{D079BDDE-F385-40B0-88EA-FDBE2D41AD64}"
+	ProjectSection(WebsiteProperties) = preProject
+		UseIISExpress = "true"
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		ProjectReferences = "{207731b8-1ee5-44cc-b69b-0deb068cf9f9}|WTISC.2014.Data.dll;"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_59688"
+		Debug.AspNetCompiler.PhysicalPath = "..\WTISC.WebSite\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_59688\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_59688"
+		Release.AspNetCompiler.PhysicalPath = "..\WTISC.WebSite\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_59688\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		SlnRelativePath = "..\WTISC.WebSite\"
+		DefaultWebSiteLanguage = "Visual C#"
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +44,10 @@ Global
 		{58EEC7B4-78C9-4342-9E7D-C4BE2B96F0AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58EEC7B4-78C9-4342-9E7D-C4BE2B96F0AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58EEC7B4-78C9-4342-9E7D-C4BE2B96F0AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D079BDDE-F385-40B0-88EA-FDBE2D41AD64}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D079BDDE-F385-40B0-88EA-FDBE2D41AD64}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D079BDDE-F385-40B0-88EA-FDBE2D41AD64}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{D079BDDE-F385-40B0-88EA-FDBE2D41AD64}.Release|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

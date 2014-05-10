@@ -37,14 +37,14 @@ namespace WTISC._2014.Data.Test.ManagementTests
 
         [TestInitialize]
         [Description("Initialize test")]
-        private void Initialize()
+        public void Initialize()
         {
             this.managementTest = new MGenero();
         }
 
         [TestCleanup]
         [Description("Delete database values")]
-        private void RestartDB()
+        public void RestartDB()
         {
             BooksEntities resetEntities = new BooksEntities();
             resetEntities.Database.ExecuteSqlCommand("DELETE [Livro]");
@@ -106,7 +106,7 @@ namespace WTISC._2014.Data.Test.ManagementTests
             expected = null;
             actual = this.managementTest.FindGenderByName("invalid name");
 
-            Assert.AreEqual(expected, actual);
+            Assert.IsNull(actual);
 
             #endregion
         }
