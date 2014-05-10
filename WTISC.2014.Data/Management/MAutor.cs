@@ -100,5 +100,42 @@ namespace WTISC._2014.Data.Management
         {
             return this.entities.Autor.ToList<Autor>();
         }
+
+        /// <summary>
+        /// Delete a Author
+        /// </summary>
+        /// <param name="id">ID of the Author</param>
+        public void Delete(int id)
+        {
+            Autor autor = this.entities.Autor.FirstOrDefault<Autor>(a => a.Id == id);
+
+            if (autor != null)
+            {
+                this.entities.Autor.Remove(autor);
+                this.entities.SaveChanges();
+            }
+        }
+
+        /// <summary>
+        /// Find a Author by ID
+        /// </summary>
+        /// <param name="id">ID of the Author</param>
+        /// <returns>Autor</returns>
+        public Autor FindAutorById(int id)
+        {
+            return this.entities.Autor.FirstOrDefault<Autor>(a => a.Id == id);
+        }
+        
+        /// <summary>
+        /// Alter the Author
+        /// </summary>
+        /// <param name="autor">Author to Update</param>
+        public void Update(Autor autor)
+        {
+            Autor atual = this.FindAutorById(autor.Id);
+            atual.Nome = autor.Nome;
+
+            this.entities.SaveChanges();
+        }
     }
 }
