@@ -6,19 +6,33 @@ namespace SpreadsheetFactory
 {
     public class Header
     {
+        private int DEFAULT_TITLE_SPAN_SIZE = 10;
+
         private IDictionary<string, object> _filters;
         private string _title;
+        private string _sheetName;
 
-        public IDictionary<string,object> Filters
+        public IDictionary<string, object> Filters
         {
             get { return _filters; }
-            //set { _filters = value; }
         }
 
         public string Title
         {
             get { return _title; }
             set { _title = value; }
+        }
+
+        public string SheetName
+        {
+            get { return _sheetName; }
+            set { _sheetName = value; }
+        }
+
+        private int TitleSpan
+        {
+            get { return DEFAULT_TITLE_SPAN_SIZE; }
+            set { DEFAULT_TITLE_SPAN_SIZE = value; }
         }
 
         public bool AddFilter(string key, object value)
@@ -34,7 +48,7 @@ namespace SpreadsheetFactory
                 {
                     _filters.Add(key, value);
                 }
-                
+
                 return true;
             }
             return false;
