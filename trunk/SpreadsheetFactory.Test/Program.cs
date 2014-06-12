@@ -23,10 +23,47 @@ namespace SpreadsheetFactory.Test
 
             SpreadsheetFactory spf = new SpreadsheetFactory();
             spf.Header = header;
+            spf.TableHeaders = new List<TableHeader>();
+
+            #region table header
+
+
+            TableHeader ta = new TableHeader();
+            ta.Text = "A";
+
+            TableHeader tb = new TableHeader();
+            tb.Text = "B";
+            tb.AddSpanCell("1");
+            tb.AddSpanCell("2");
+
+            TableHeader tc = new TableHeader();
+            tc.Text = "C";
             
+            TableHeader td = new TableHeader();
+            td.Text = "D";
+            td.AddSpanCell("3");
+            td.AddSpanCell("4");
+
+            TableHeader te = new TableHeader();
+            te.Text = "E";
+            te.AddSpanCell("5");
+            te.AddSpanCell("6");
+
+            tc.Cells = new List<TableHeader>();
+            tc.Cells.Add(td);
+            tc.Cells.Add(te);
+
+            //spf.TableHeaders.Add(tx);
+            //spf.TableHeaders.Add(ta);
+            //spf.TableHeaders.Add(tb);
+            spf.TableHeaders.Add(tc);
+            //spf.TableHeaders.Add(td);
+            //spf.TableHeaders.Add(te);
+
+            #endregion table header
 
             WorkbookManager.CreateSpreadsheet(spf);
-            WorkbookManager.SaveSpreadsheet(@"E:\source\SVN\pessoal\trunk\SpreadsheetFactory\bin\Debug\", "teste.xls");
+            WorkbookManager.SaveSpreadsheet(@"E:\source\SVN\pessoal\trunk\SpreadsheetFactory\bin\Debug\", DateTime.Now.Second+DateTime.Now.Millisecond+"teste.xls");
         }
     }
 }

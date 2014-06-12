@@ -7,8 +7,8 @@ namespace SpreadsheetFactory
     public class SpreadsheetFactory
     {
         private Header _header;
-        
-        private TableHeader _tableHeader;
+
+        private IList<TableHeader> _tableHeaders;
 
         public Header Header
         {
@@ -16,10 +16,10 @@ namespace SpreadsheetFactory
             set { _header = value; }
         }
 
-        public TableHeader TableHeader
+        public IList<TableHeader> TableHeaders
         {
-            get { return _tableHeader; }
-            set { _tableHeader = value; }
+            get { return _tableHeaders; }
+            set { _tableHeaders = value; }
         }
     }
 }
