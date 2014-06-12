@@ -9,6 +9,10 @@ namespace SpreadsheetFactory
 {
     public class WorkbookManager
     {
+        protected static int tableHeaderRows = 0;
+
+        private static int tableHeaderCells = 0;
+
         private static HSSFWorkbook _workbook;
 
         private static HSSFWorkbook Workbook
@@ -43,6 +47,111 @@ namespace SpreadsheetFactory
                     {
                         sheet = ConfigHeader(sheet, spreadsheetFactory.Header.Filters);
                     }
+
+                    sheet.CreateRow(sheet.LastRowNum + 1);
+                    sheet.CreateRow(sheet.LastRowNum + 1);
+
+                    PrepareTableHeader(sheet, spreadsheetFactory.TableHeaders, 0);
+                    ConfigTableHeader(sheet, spreadsheetFactory.TableHeaders, 0, sheet.LastRowNum);
+                }
+            }
+        }
+
+        private static void PrepareTableHeader(HSSFSheet sheet, IList<TableHeader> tableHeaders, int cell)
+        {
+            CreateHeaderRows(sheet, tableHeaders);
+            GetTableHeaderCells(tableHeaders);
+            CreateHeaderCells(sheet, cell);
+        }
+
+        private static void ConfigTableHeader(HSSFSheet sheet, IList<TableHeader> tableHeaders, int cell, int row)
+        {
+            int headerCell = cell;
+            //int cellRow = sheet.LastRowNum - (tableHeaderRows + 1);
+            int cellRow = row - (tableHeaderRows + 1);
+            foreach (var item in tableHeaders)
+            {
+                if (item.Cells == null)//&& item.Cells.Count == 0)
+                {
+                    sheet.GetRow(cellRow)
+                        .GetCell(headerCell)
+                        .SetCellValue(item.Text);
+
+                    //mesclar linhas
+                    sheet.AddMergedRegion(new CellRangeAddress(cellRow, sheet.LastRowNum - 1, headerCell, item.SpanSize));
+                    headerCell++;
+                }
+                else if (item.Cells != null)
+                {
+                    sheet.GetRow(cellRow)
+                        .GetCell(headerCell)
+                        .SetCellValue(item.Text);
+
+                    int headerCellAux = headerCell + item.Cells.Count - 1;
+
+                    //mesclar celulas
+                    sheet.AddMergedRegion(new CellRangeAddress(cellRow, cellRow, headerCell, item.SpanSize));
+                    // headerCell += item.Cells.Count;
+                    
+                    foreach (var internItem in item.Cells)
+                    {
+                        if (internItem.Cells == null || internItem.Cells.Count == 0)
+                        {
+                            sheet.GetRow(cellRow + 1)
+                                .GetCell(headerCell)
+                                .SetCellValue(internItem.Text);
+                            //mesclar linhas
+                            sheet.AddMergedRegion(new CellRangeAddress(cellRow + 1, sheet.LastRowNum - 1, headerCell, item.SpanSize));
+                            headerCell++;
+                        }
+                    }
+                    ConfigTableHeader(sheet, item.Cells, headerCell, row++);
+                }
+                //else if (item.Cells == null)
+                //{
+                //    sheet.GetRow(cellRow)
+                //        .GetCell(headerCell)
+                //        .SetCellValue(item.Text);
+                    
+                //    //mesclar linhas
+                //    sheet.AddMergedRegion(new CellRangeAddress(cellRow, sheet.LastRowNum - 1, headerCell, headerCell));
+                //    headerCell++;
+                //}
+            }
+        }
+
+        private static void CreateHeaderRows(HSSFSheet sheet, IList<TableHeader> tableHeaders)
+        {
+            for (int i = 0; i <= tableHeaderRows; i++)
+            {
+                sheet.CreateRow(sheet.LastRowNum + 1);
+            }
+        }
+
+        private static void CreateHeaderCells(HSSFSheet sheet, int firstCell)
+        {
+            for (int i = tableHeaderRows + 1; i > 0; i--)
+            {
+                for (int j = firstCell; j <= tableHeaderCells + firstCell; j++)
+                {
+                    //sheet.GetRow(sheet.LastRowNum - i).CreateCell(j).SetCellValue(i + ":" + j);
+                    sheet.GetRow(sheet.LastRowNum - i).CreateCell(j);
+                }
+            }
+        }
+
+        private static void GetTableHeaderCells(IList<TableHeader> tableHeaders)
+        {
+            foreach (var item in tableHeaders)
+            {
+                if (item.Cells == null || item.Cells.Count == 0)
+                {
+                    tableHeaderCells++;
+                }
+                else
+                {
+                    tableHeaderCells++;
+                    GetTableHeaderCells(item.Cells);
                 }
             }
         }

@@ -7,12 +7,15 @@ namespace SpreadsheetFactory
     public class TableHeader : WorkbookManager
     {
         private string _text;
-        private IList<TableHeader> _cells;
+        private IList<TableHeader> _cells = null;
 
         public string Text
         {
             get { return _text; }
-            set { _text = value; }
+            set
+            {
+                _text = value;
+            }
         }
 
         public IList<TableHeader> Cells
@@ -21,9 +24,54 @@ namespace SpreadsheetFactory
             set { _cells = value; }
         }
 
-        public void AddSpanCell(string value)
+        public TableHeader AddSpanCell(string value)
         {
-            _cells.Add(new TableHeader() { _text = value });
+            TableHeader tableHeader = new TableHeader();
+            tableHeader.Text = value;
+            if (_cells == null)
+            {
+                _cells = new List<TableHeader>();
+            }
+            _cells.Add(tableHeader);
+
+            if (_cells.Count > tableHeaderRows)
+            {
+                tableHeaderRows = _cells.Count;
+            }
+            return tableHeader;
+        }
+
+        private int CellSpanCount(IList<TableHeader> list)
+        {
+            int total = 0;
+            foreach (var item in list)
+            {
+                if (item.Cells == null)
+                {
+                    total++;
+                }
+                else
+                {
+                    total += CellSpanCount(item.Cells);
+                }
+            }
+
+            return total;
+        }
+
+        public int SpanSize
+        {
+            get
+            {
+                if (_cells != null) 
+                {
+                    return CellSpanCount(_cells) - 1;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
         }
     }
 }
