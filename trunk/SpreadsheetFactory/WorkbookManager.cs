@@ -52,7 +52,8 @@ namespace SpreadsheetFactory
                     sheet.CreateRow(sheet.LastRowNum + 1);
 
                     PrepareTableHeader(sheet, spreadsheetFactory.TableHeaders, 0);
-                    ConfigTableHeader(sheet, spreadsheetFactory.TableHeaders, 0, sheet.LastRowNum);
+                    int cellAux = 0;
+                    ConfigTableHeader(sheet, spreadsheetFactory.TableHeaders, ref cellAux, (sheet.LastRowNum - tableHeaderRows) - 1);
                 }
             }
         }
@@ -62,13 +63,16 @@ namespace SpreadsheetFactory
             CreateHeaderRows(sheet, tableHeaders);
             GetTableHeaderCells(tableHeaders);
             CreateHeaderCells(sheet, cell);
+            //Teste(tableHeaders);
         }
-
-        private static void ConfigTableHeader(HSSFSheet sheet, IList<TableHeader> tableHeaders, int cell, int row)
+        static int headerCell;
+        private static void ConfigTableHeader(HSSFSheet sheet, IList<TableHeader> tableHeaders, ref int cell, int row)
         {
-            int headerCell = cell;
+            headerCell = cell;
+            int span = 0;
             //int cellRow = sheet.LastRowNum - (tableHeaderRows + 1);
-            int cellRow = row - (tableHeaderRows + 1);
+            int cellRow = row;// -(tableHeaderRows + 1);
+
             foreach (var item in tableHeaders)
             {
                 if (item.Cells == null)//&& item.Cells.Count == 0)
@@ -78,7 +82,7 @@ namespace SpreadsheetFactory
                         .SetCellValue(item.Text);
 
                     //mesclar linhas
-                    sheet.AddMergedRegion(new CellRangeAddress(cellRow, sheet.LastRowNum - 1, headerCell, item.SpanSize));
+                    sheet.AddMergedRegion(new CellRangeAddress(cellRow, sheet.LastRowNum - 1, headerCell, headerCell + item.SpanSize));
                     headerCell++;
                 }
                 else if (item.Cells != null)
@@ -90,9 +94,11 @@ namespace SpreadsheetFactory
                     int headerCellAux = headerCell + item.Cells.Count - 1;
 
                     //mesclar celulas
-                    sheet.AddMergedRegion(new CellRangeAddress(cellRow, cellRow, headerCell, item.SpanSize));
+                    sheet.AddMergedRegion(new CellRangeAddress(cellRow, cellRow, headerCell, headerCell + item.SpanSize));
                     // headerCell += item.Cells.Count;
-                    
+
+                    //int headerCellAux = headerCell;
+                    bool callRecursive = true;
                     foreach (var internItem in item.Cells)
                     {
                         if (internItem.Cells == null || internItem.Cells.Count == 0)
@@ -101,18 +107,29 @@ namespace SpreadsheetFactory
                                 .GetCell(headerCell)
                                 .SetCellValue(internItem.Text);
                             //mesclar linhas
-                            sheet.AddMergedRegion(new CellRangeAddress(cellRow + 1, sheet.LastRowNum - 1, headerCell, item.SpanSize));
+                            sheet.AddMergedRegion(new CellRangeAddress(cellRow + 1, sheet.LastRowNum - 1, headerCell, headerCell));
                             headerCell++;
+                            //headerCell += item.SpanSize;
+                            callRecursive = false;
+                            span = item.SpanSize > 1 ? item.SpanSize : 0;
                         }
                     }
-                    ConfigTableHeader(sheet, item.Cells, headerCell, row++);
+
+                    if (callRecursive)
+                    {
+                        ConfigTableHeader(sheet, item.Cells, ref headerCell, cellRow + 1);
+                    }
+                    else
+                    {
+                        span = 0;
+                    }
                 }
                 //else if (item.Cells == null)
                 //{
                 //    sheet.GetRow(cellRow)
                 //        .GetCell(headerCell)
                 //        .SetCellValue(item.Text);
-                    
+
                 //    //mesclar linhas
                 //    sheet.AddMergedRegion(new CellRangeAddress(cellRow, sheet.LastRowNum - 1, headerCell, headerCell));
                 //    headerCell++;
@@ -134,8 +151,8 @@ namespace SpreadsheetFactory
             {
                 for (int j = firstCell; j <= tableHeaderCells + firstCell; j++)
                 {
-                    //sheet.GetRow(sheet.LastRowNum - i).CreateCell(j).SetCellValue(i + ":" + j);
-                    sheet.GetRow(sheet.LastRowNum - i).CreateCell(j);
+                    sheet.GetRow(sheet.LastRowNum - i).CreateCell(j).SetCellValue(i + ":" + j);
+                    //sheet.GetRow(sheet.LastRowNum - i).CreateCell(j);
                 }
             }
         }
@@ -150,10 +167,31 @@ namespace SpreadsheetFactory
                 }
                 else
                 {
-                    tableHeaderCells++;
+                    //tableHeaderCells++;
                     GetTableHeaderCells(item.Cells);
                 }
             }
+        }
+
+        private static int Teste(IList<TableHeader> tableHeaders)
+        {
+            int x = 0;
+            foreach (var item in tableHeaders)
+            {
+                if (item.Cells == null || item.Cells.Count == 0)
+                {
+                    tableHeaderRows++;
+                }
+                else
+                {
+                    //tableHeaderCells++;
+                    x += 1;
+                    x += Teste(item.Cells);
+                }
+            }
+
+            if (tableHeaderRows < x) tableHeaderRows = x;
+            return x;
         }
 
         private static HSSFSheet CreateTitle(string title, string sheetName)
@@ -201,7 +239,6 @@ namespace SpreadsheetFactory
                         sheet.GetRow(sheet.LastRowNum).CreateCell(1, HSSFCell.CELL_TYPE_STRING).SetCellValue(((DateTime)item.Value).ToShortDateString());
                         break;
                 }
-
             }
 
             return sheet;
