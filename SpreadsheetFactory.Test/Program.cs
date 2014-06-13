@@ -38,7 +38,7 @@ namespace SpreadsheetFactory.Test
 
             TableHeader tc = new TableHeader();
             tc.Text = "C";
-            
+
             TableHeader td = new TableHeader();
             td.Text = "D";
             td.AddSpanCell("3");
@@ -53,17 +53,73 @@ namespace SpreadsheetFactory.Test
             tc.Cells.Add(td);
             tc.Cells.Add(te);
 
-            //spf.TableHeaders.Add(tx);
-            //spf.TableHeaders.Add(ta);
-            //spf.TableHeaders.Add(tb);
-            spf.TableHeaders.Add(tc);
-            //spf.TableHeaders.Add(td);
-            //spf.TableHeaders.Add(te);
+           spf.TableHeaders.Add(ta);
+           spf.TableHeaders.Add(tb);
+           spf.TableHeaders.Add(tc);
 
             #endregion table header
 
+
+            #region teste final
+
+
+            //TableHeader ta = new TableHeader();
+            //ta.Text = "A";
+
+            //TableHeader tb = new TableHeader();
+            //tb.Text = "B";
+            //tb.AddSpanCell("1");
+            //tb.AddSpanCell("2");
+
+            //TableHeader tc = new TableHeader();
+            //tc.Text = "C";
+
+            //TableHeader td = new TableHeader();
+            //td.Text = "D";
+
+            //TableHeader te = new TableHeader();
+            //te.Text = "E";
+
+            //TableHeader tf = new TableHeader();
+            //tf.Text = "F";
+            //tf.AddSpanCell("3");
+            //tf.AddSpanCell("4");
+
+            //TableHeader tg = new TableHeader();
+            //tg.Text = "G";
+            //tg.AddSpanCell("5");
+            //tg.AddSpanCell("6");
+
+            //TableHeader th = new TableHeader();
+            //th.Text = "H";
+            //th.AddSpanCell("7");
+            //th.AddSpanCell("8");
+
+            //TableHeader ti = new TableHeader();
+            //ti.Text = "I";
+            //ti.AddSpanCell("9");
+            //ti.AddSpanCell("10");
+
+            //td.Cells = new List<TableHeader>();
+            //td.Cells.Add(tf);
+            //td.Cells.Add(tg);
+
+            //te.Cells = new List<TableHeader>();
+            //te.Cells.Add(th);
+            //te.Cells.Add(ti);
+
+            //tc.Cells = new List<TableHeader>();
+            //tc.Cells.Add(td);
+            //tc.Cells.Add(te);
+
+            //spf.TableHeaders.Add(ta);
+            //spf.TableHeaders.Add(tb);
+            //spf.TableHeaders.Add(tc);
+
+            #endregion
+
             WorkbookManager.CreateSpreadsheet(spf);
-            WorkbookManager.SaveSpreadsheet(@"E:\source\SVN\pessoal\trunk\SpreadsheetFactory\bin\Debug\", DateTime.Now.Second+DateTime.Now.Millisecond+"teste.xls");
+            WorkbookManager.SaveSpreadsheet("","teste.xls");
         }
     }
 }
