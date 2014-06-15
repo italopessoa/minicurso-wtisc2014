@@ -4,7 +4,7 @@ using System.Text;
 
 namespace SpreadsheetFactory
 {
-    public class TableHeader : WorkbookManager
+    public class TableHeader// : WorkbookManager
     {
         private string _text;
         private IList<TableHeader> _cells = null;
@@ -34,10 +34,7 @@ namespace SpreadsheetFactory
             }
             _cells.Add(tableHeader);
 
-            if (_cells.Count > tableHeaderRows)
-            {
-                tableHeaderRows = _cells.Count;
-            }
+
             return tableHeader;
         }
 
@@ -63,7 +60,7 @@ namespace SpreadsheetFactory
         {
             get
             {
-                if (_cells != null) 
+                if (_cells != null)
                 {
                     return CellSpanCount(_cells) - 1;
                 }

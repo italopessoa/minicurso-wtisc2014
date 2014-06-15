@@ -13,6 +13,10 @@ namespace SpreadsheetFactory
 
         private static int tableHeaderCells = 0;
 
+        private static int headerCell;
+
+        private static int tableHeaderCellsAux = 0;
+
         private static HSSFWorkbook _workbook;
 
         private static HSSFWorkbook Workbook
@@ -26,6 +30,10 @@ namespace SpreadsheetFactory
                 return _workbook;
             }
         }
+
+        private static IList<object> contentList;
+
+        private static IDictionary<string, string> contentTableTitleList;
 
         static WorkbookManager()
         {
@@ -53,29 +61,27 @@ namespace SpreadsheetFactory
 
                     PrepareTableHeader(sheet, spreadsheetFactory.TableHeaders, 0);
                     int cellAux = 0;
-                    ConfigTableHeader(sheet, spreadsheetFactory.TableHeaders, ref cellAux, (sheet.LastRowNum - tableHeaderRows) - 1);
+                    ConfigTableHeader(sheet, spreadsheetFactory.TableHeaders, ref cellAux, (sheet.LastRowNum - tableHeaderRows));
                 }
             }
         }
 
         private static void PrepareTableHeader(HSSFSheet sheet, IList<TableHeader> tableHeaders, int cell)
         {
+            SetTotalHeaderRows(tableHeaders);
             CreateHeaderRows(sheet, tableHeaders);
             GetTableHeaderCells(tableHeaders);
             CreateHeaderCells(sheet, cell);
-            //Teste(tableHeaders);
         }
-        static int headerCell;
+
         private static void ConfigTableHeader(HSSFSheet sheet, IList<TableHeader> tableHeaders, ref int cell, int row)
         {
             headerCell = cell;
-            int span = 0;
-            //int cellRow = sheet.LastRowNum - (tableHeaderRows + 1);
-            int cellRow = row;// -(tableHeaderRows + 1);
+            int cellRow = row;
 
             foreach (var item in tableHeaders)
             {
-                if (item.Cells == null)//&& item.Cells.Count == 0)
+                if (item.Cells == null)
                 {
                     sheet.GetRow(cellRow)
                         .GetCell(headerCell)
@@ -95,9 +101,7 @@ namespace SpreadsheetFactory
 
                     //mesclar celulas
                     sheet.AddMergedRegion(new CellRangeAddress(cellRow, cellRow, headerCell, headerCell + item.SpanSize));
-                    // headerCell += item.Cells.Count;
 
-                    //int headerCellAux = headerCell;
                     bool callRecursive = true;
                     foreach (var internItem in item.Cells)
                     {
@@ -109,9 +113,7 @@ namespace SpreadsheetFactory
                             //mesclar linhas
                             sheet.AddMergedRegion(new CellRangeAddress(cellRow + 1, sheet.LastRowNum - 1, headerCell, headerCell));
                             headerCell++;
-                            //headerCell += item.SpanSize;
                             callRecursive = false;
-                            span = item.SpanSize > 1 ? item.SpanSize : 0;
                         }
                     }
 
@@ -119,27 +121,13 @@ namespace SpreadsheetFactory
                     {
                         ConfigTableHeader(sheet, item.Cells, ref headerCell, cellRow + 1);
                     }
-                    else
-                    {
-                        span = 0;
-                    }
                 }
-                //else if (item.Cells == null)
-                //{
-                //    sheet.GetRow(cellRow)
-                //        .GetCell(headerCell)
-                //        .SetCellValue(item.Text);
-
-                //    //mesclar linhas
-                //    sheet.AddMergedRegion(new CellRangeAddress(cellRow, sheet.LastRowNum - 1, headerCell, headerCell));
-                //    headerCell++;
-                //}
             }
         }
 
         private static void CreateHeaderRows(HSSFSheet sheet, IList<TableHeader> tableHeaders)
         {
-            for (int i = 0; i <= tableHeaderRows; i++)
+            for (int i = 0; i < tableHeaderRows; i++)
             {
                 sheet.CreateRow(sheet.LastRowNum + 1);
             }
@@ -149,10 +137,10 @@ namespace SpreadsheetFactory
         {
             for (int i = tableHeaderRows + 1; i > 0; i--)
             {
-                for (int j = firstCell; j <= tableHeaderCells + firstCell; j++)
+                for (int j = firstCell; j < tableHeaderCells + firstCell; j++)
                 {
-                    sheet.GetRow(sheet.LastRowNum - i).CreateCell(j).SetCellValue(i + ":" + j);
-                    //sheet.GetRow(sheet.LastRowNum - i).CreateCell(j);
+                    //sheet.GetRow(sheet.LastRowNum - i).CreateCell(j).SetCellValue(i + ":" + j);
+                    sheet.GetRow(sheet.LastRowNum - i).CreateCell(j);
                 }
             }
         }
@@ -173,25 +161,54 @@ namespace SpreadsheetFactory
             }
         }
 
-        private static int Teste(IList<TableHeader> tableHeaders)
+        private static void SetTotalHeaderRows(IList<TableHeader> tableHeaders)
         {
-            int x = 0;
             foreach (var item in tableHeaders)
             {
-                if (item.Cells == null || item.Cells.Count == 0)
+                if (item.Cells == null)
                 {
-                    tableHeaderRows++;
+                    tableHeaderCellsAux++;
+                    if (tableHeaderCellsAux > tableHeaderRows)
+                    {
+                        tableHeaderRows = tableHeaderCellsAux;
+                    }
                 }
-                else
+                else if (item.Cells != null)
                 {
-                    //tableHeaderCells++;
-                    x += 1;
-                    x += Teste(item.Cells);
-                }
-            }
+                    tableHeaderCellsAux++;
+                    bool callRecursive = true;
+                    foreach (var internItem in item.Cells)
+                    {
+                        if (internItem.Cells == null || internItem.Cells.Count == 0)
+                        {
+                            callRecursive = false;
+                        }
+                    }
 
-            if (tableHeaderRows < x) tableHeaderRows = x;
-            return x;
+                    if (callRecursive)
+                    {
+                        //teste++;
+                        SetTotalHeaderRows(item.Cells);
+                        if (tableHeaderCellsAux > tableHeaderRows)
+                        {
+                            tableHeaderRows = tableHeaderCellsAux;
+                        }
+                    }
+                    else
+                    {
+                        tableHeaderCellsAux++;
+                        if (tableHeaderCellsAux > tableHeaderRows)
+                        {
+                            tableHeaderRows = tableHeaderCellsAux;
+                        }
+                    }
+                }
+                if (tableHeaderCellsAux > tableHeaderRows)
+                {
+                    tableHeaderRows = tableHeaderCellsAux;
+                }
+                tableHeaderCellsAux = 0;
+            }
         }
 
         private static HSSFSheet CreateTitle(string title, string sheetName)
