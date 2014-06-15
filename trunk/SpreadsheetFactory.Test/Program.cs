@@ -53,9 +53,9 @@ namespace SpreadsheetFactory.Test
             tc.Cells.Add(td);
             tc.Cells.Add(te);
 
-           spf.TableHeaders.Add(ta);
-           spf.TableHeaders.Add(tb);
-           spf.TableHeaders.Add(tc);
+            spf.TableHeaders.Add(ta);
+            spf.TableHeaders.Add(tb);
+            spf.TableHeaders.Add(tc);
 
             #endregion table header
 
@@ -118,8 +118,11 @@ namespace SpreadsheetFactory.Test
 
             #endregion
 
+
             WorkbookManager.CreateSpreadsheet(spf);
-            WorkbookManager.SaveSpreadsheet("","teste.xls");
+            //Console.WriteLine("FIM");
+            //Console.ReadKey();
+            WorkbookManager.SaveSpreadsheet("", DateTime.Now.ToString().Replace("/", "").Replace(":","").Replace(" ","")+".xls");
         }
     }
 }
