@@ -62,13 +62,28 @@ namespace SpreadsheetFactory
                     PrepareTableHeader(sheet, spreadsheetFactory.TableHeaders, 0);
                     int cellAux = 0;
                     ConfigTableHeader(sheet, spreadsheetFactory.TableHeaders, ref cellAux, (sheet.LastRowNum - tableHeaderRows));
+                    List<object> list = new List<object>();
+                    list.Add(new Pessoa() { Idade = 12, Nascimento = DateTime.Now, Nome = "Italo", Salario = 10.3 });
+                    list.Add(new Pessoa() { Idade = 12, Nascimento = DateTime.Now, Nome = "Italo", Salario = 10.3 });
+                    list.Add(new Pessoa() { Idade = 12, Nascimento = DateTime.Now, Nome = "Italo", Salario = 10.3 });
+                    list.Add(new Pessoa() { Idade = 12, Nascimento = DateTime.Now, Nome = "Italo", Salario = 10.3 });
+
+                    string[] properties = new string[4];
+                    properties[0] = "Idade";
+                    properties[1] = "Nascimento";
+                    properties[2] = "Nome";
+                    properties[3] = "Salario";
+
+                    int firstRow = sheet.LastRowNum;
+                    CreateContentTableCells(sheet, list.Count, list.Count, 0, firstRow);
+                    SetContentTableCellsValue(sheet, firstRow, 0, properties, list);
                 }
             }
         }
 
         private static void PrepareTableHeader(HSSFSheet sheet, IList<TableHeader> tableHeaders, int cell)
         {
-            SetTotalHeaderRows(tableHeaders);
+            tableHeaderRows = SheetUtil.GetTotalHeaderRows(tableHeaders);
             CreateHeaderRows(sheet, tableHeaders);
             GetTableHeaderCells(tableHeaders);
             CreateHeaderCells(sheet, cell);
@@ -145,6 +160,49 @@ namespace SpreadsheetFactory
             }
         }
 
+        private static void CreateContentTableCells(HSSFSheet sheet, int rows, int cells, int firstCell, int firstRow)
+        {
+            for (int i = sheet.LastRowNum; i < firstRow + rows; i++)
+            {
+                for (int j = firstCell; j < firstCell + cells; j++)
+                {
+                    sheet.CreateRow(i).CreateCell(j).SetCellValue("A");
+                }
+            }
+        }
+
+        private static void SetContentTableCellsValue(HSSFSheet sheet, int firstRow, int firstCell, string[] properties, List<object> values)
+        {
+            int row = firstRow;
+            object propValue;
+            foreach (var item in values)
+            {
+                for (int i = firstCell; i < properties.Length; i++)
+                {
+                    propValue = GetPropValue(item, properties[i]);
+                    switch (SheetUtil.GetCellType(propValue))
+                    {
+                        case HSSFCell.CELL_TYPE_NUMERIC:
+                            sheet.GetRow(row).GetCell(i).SetCellValue(double.Parse(propValue.ToString()));
+                            break;
+                        case HSSFCell.CELL_TYPE_STRING:
+                            sheet.GetRow(row).GetCell(i).SetCellValue(propValue.ToString());
+                            break;
+                        case SheetUtil.CELL_TYPE_DATETIME:
+                            sheet.GetRow(row).GetCell(i).SetCellValue(((DateTime)propValue).ToShortDateString());
+                            break;
+                    }
+                    //sheet.GetRow(row).GetCell(i).SetCellValue("A");
+                }
+                row++;
+            }
+        }
+
+        private static object GetPropValue(object src, string propName)
+        {
+            return src.GetType().GetProperty(propName).GetValue(src, null);
+        }
+
         private static void GetTableHeaderCells(IList<TableHeader> tableHeaders)
         {
             foreach (var item in tableHeaders)
@@ -158,56 +216,6 @@ namespace SpreadsheetFactory
                     //tableHeaderCells++;
                     GetTableHeaderCells(item.Cells);
                 }
-            }
-        }
-
-        private static void SetTotalHeaderRows(IList<TableHeader> tableHeaders)
-        {
-            foreach (var item in tableHeaders)
-            {
-                if (item.Cells == null)
-                {
-                    tableHeaderCellsAux++;
-                    if (tableHeaderCellsAux > tableHeaderRows)
-                    {
-                        tableHeaderRows = tableHeaderCellsAux;
-                    }
-                }
-                else if (item.Cells != null)
-                {
-                    tableHeaderCellsAux++;
-                    bool callRecursive = true;
-                    foreach (var internItem in item.Cells)
-                    {
-                        if (internItem.Cells == null || internItem.Cells.Count == 0)
-                        {
-                            callRecursive = false;
-                        }
-                    }
-
-                    if (callRecursive)
-                    {
-                        //teste++;
-                        SetTotalHeaderRows(item.Cells);
-                        if (tableHeaderCellsAux > tableHeaderRows)
-                        {
-                            tableHeaderRows = tableHeaderCellsAux;
-                        }
-                    }
-                    else
-                    {
-                        tableHeaderCellsAux++;
-                        if (tableHeaderCellsAux > tableHeaderRows)
-                        {
-                            tableHeaderRows = tableHeaderCellsAux;
-                        }
-                    }
-                }
-                if (tableHeaderCellsAux > tableHeaderRows)
-                {
-                    tableHeaderRows = tableHeaderCellsAux;
-                }
-                tableHeaderCellsAux = 0;
             }
         }
 
@@ -241,18 +249,15 @@ namespace SpreadsheetFactory
 
                 Type type = item.Value.GetType();
 
-                switch (type.FullName)
+                switch (SheetUtil.GetCellType(item.Value))
                 {
-                    case "System.Int16":
-                    case "System.Int32":
-                    case "System.Int64":
-                    case "System.Double":
+                    case HSSFCell.CELL_TYPE_NUMERIC:
                         sheet.GetRow(sheet.LastRowNum).CreateCell(1, HSSFCell.CELL_TYPE_NUMERIC).SetCellValue(double.Parse(item.Value.ToString()));
                         break;
-                    case "System.String":
+                    case HSSFCell.CELL_TYPE_STRING:
                         sheet.GetRow(sheet.LastRowNum).CreateCell(1, HSSFCell.CELL_TYPE_STRING).SetCellValue(item.Value.ToString());
                         break;
-                    case "System.DateTime":
+                    case SheetUtil.CELL_TYPE_DATETIME:
                         sheet.GetRow(sheet.LastRowNum).CreateCell(1, HSSFCell.CELL_TYPE_STRING).SetCellValue(((DateTime)item.Value).ToShortDateString());
                         break;
                 }
@@ -270,5 +275,12 @@ namespace SpreadsheetFactory
             fs.Close();
             ms.Close();
         }
+    }
+    public class Pessoa
+    {
+        public string Nome { get; set; }
+        public int Idade { get; set; }
+        public DateTime Nascimento { get; set; }
+        public Double Salario { get; set; }
     }
 }
