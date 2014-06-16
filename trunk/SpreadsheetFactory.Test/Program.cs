@@ -11,14 +11,13 @@ namespace SpreadsheetFactory.Test
         static void Main(string[] args)
         {
             Header header = new Header();
-            header.AddFilter("klkljjkljkl", 10.3);
-            header.AddFilter("nome", "italo");
-            header.AddFilter("idade", 1);
-            header.AddFilter("lkj", DateTime.Now);
+            header.AddFilter("Valor", 10.3);
+            header.AddFilter("Nome", "italo");
+            header.AddFilter("Idade", 22);
+            header.AddFilter("Data de nascimento", DateTime.Now);
 
             short a = 1;
-            header.AddFilter("lkj12e2e2e", a);
-            header.Title = "Titulo";
+            header.Title = "Testando exportação";
             header.SheetName = "Sheet numero 1";
 
             SpreadsheetFactory spf = new SpreadsheetFactory();
@@ -125,4 +124,6 @@ namespace SpreadsheetFactory.Test
             WorkbookManager.SaveSpreadsheet("", DateTime.Now.ToString().Replace("/", "").Replace(":","").Replace(" ","")+".xls");
         }
     }
+
+   
 }
