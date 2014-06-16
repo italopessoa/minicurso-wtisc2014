@@ -10,6 +10,10 @@ namespace SpreadsheetFactory
 
         private IList<TableHeader> _tableHeaders;
 
+        private List<object> _datasource;
+        
+        private string[] _properties;
+
         public Header Header
         {
             get { return _header; }
@@ -20,6 +24,18 @@ namespace SpreadsheetFactory
         {
             get { return _tableHeaders; }
             set { _tableHeaders = value; }
+        }
+
+        public List<object> Datasource
+        {
+            get { return _datasource; }
+            set { _datasource = value; }
+        }
+
+        public string[] Properties
+        {
+            get { return _properties; }
+            set { _properties = value; }
         }
     }
 }

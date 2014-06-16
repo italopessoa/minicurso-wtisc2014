@@ -11,29 +11,15 @@ namespace SpreadsheetFactory
     {
         protected static int tableHeaderRows = 0;
 
-        private static int tableHeaderCells = 0;
+        private static int _tableHeaderCells = 0;
 
         private static int headerCell;
 
-        private static int tableHeaderCellsAux = 0;
-
         private static HSSFWorkbook _workbook;
 
-        private static HSSFWorkbook Workbook
-        {
-            get
-            {
-                if (_workbook == null)
-                {
-                    _workbook = new HSSFWorkbook();
-                }
-                return _workbook;
-            }
-        }
+        private static HSSFCellStyle _headerCellStyle = null;
 
-        private static IList<object> contentList;
-
-        private static IDictionary<string, string> contentTableTitleList;
+        private static HSSFCellStyle _defaultContentCellStyle = null;
 
         static WorkbookManager()
         {
@@ -43,13 +29,34 @@ namespace SpreadsheetFactory
             }
         }
 
+        public static HSSFCellStyle GetNewHSSFCellStyle()
+        {
+            return _workbook.CreateCellStyle();
+        }
+
+        public static HSSFFont GetNewHSSFCellFont()
+        {
+            return _workbook.CreateFont();
+        }
+
+        public static void SetHeaderCellStyle(HSSFCellStyle cellStyle)
+        {
+            _headerCellStyle = cellStyle;
+        }
+
+        public static void SetDefaultContentCellStyle(HSSFCellStyle cellStyle)
+        {
+            _defaultContentCellStyle = cellStyle;
+        }
+
         public static void CreateSpreadsheet(SpreadsheetFactory spreadsheetFactory)
         {
             if (spreadsheetFactory != null)
             {
+                HSSFSheet sheet = null;
                 if (spreadsheetFactory.Header != null)
                 {
-                    HSSFSheet sheet = CreateTitle(spreadsheetFactory.Header.Title, spreadsheetFactory.Header.SheetName);
+                    sheet = CreateTitle(spreadsheetFactory.Header.Title, spreadsheetFactory.Header.SheetName);
 
                     if (spreadsheetFactory.Header.Filters != null && spreadsheetFactory.Header.Filters.Count > 0)
                     {
@@ -61,22 +68,56 @@ namespace SpreadsheetFactory
 
                     PrepareTableHeader(sheet, spreadsheetFactory.TableHeaders, 0);
                     int cellAux = 0;
+                    int firstRow = (sheet.LastRowNum - tableHeaderRows);
                     ConfigTableHeader(sheet, spreadsheetFactory.TableHeaders, ref cellAux, (sheet.LastRowNum - tableHeaderRows));
-                    List<object> list = new List<object>();
-                    list.Add(new Pessoa() { Idade = 12, Nascimento = DateTime.Now, Nome = "Italo", Salario = 10.3 });
-                    list.Add(new Pessoa() { Idade = 12, Nascimento = DateTime.Now, Nome = "Italo", Salario = 10.3 });
-                    list.Add(new Pessoa() { Idade = 12, Nascimento = DateTime.Now, Nome = "Italo", Salario = 10.3 });
-                    list.Add(new Pessoa() { Idade = 12, Nascimento = DateTime.Now, Nome = "Italo", Salario = 10.3 });
 
-                    string[] properties = new string[4];
-                    properties[0] = "Idade";
-                    properties[1] = "Nascimento";
-                    properties[2] = "Nome";
-                    properties[3] = "Salario";
+                    if (_headerCellStyle != null)
+                    {
+                        ApplyCellStyle(sheet, firstRow, cellAux, tableHeaderRows, _tableHeaderCells,_headerCellStyle);
+                    }
+
+                }
+
+                if (spreadsheetFactory.Datasource != null)
+                {
+                    if (sheet == null)
+                    {
+                        sheet = _workbook.CreateSheet();
+                    }
 
                     int firstRow = sheet.LastRowNum;
-                    CreateContentTableCells(sheet, list.Count, list.Count, 0, firstRow);
-                    SetContentTableCellsValue(sheet, firstRow, 0, properties, list);
+                    CreateContentTableCells(sheet, spreadsheetFactory.Datasource.Count, spreadsheetFactory.Datasource.Count, 0, firstRow);
+                    SetContentTableCellsValue(sheet, firstRow, 0, spreadsheetFactory.Properties, spreadsheetFactory.Datasource);
+
+                    if(_defaultContentCellStyle !=null)
+                    {
+                        ApplyCellStyle(sheet, firstRow, 0, spreadsheetFactory.Datasource.Count, spreadsheetFactory.Properties.Length,_defaultContentCellStyle);
+                    }
+
+                    #region configurar formatacao condicional
+                    //HSSFSheetConditionalFormatting cf = sheet.SheetConditionalFormatting;
+                    //HSSFConditionalFormattingRule rule = cf.CreateConditionalFormattingRule(NPOI.HSSF.Record.ComparisonOperator.GE, "3", null);
+
+                    //HSSFPatternFormatting patternFmt = rule.CreatePatternFormatting();
+                    //patternFmt.FillBackgroundColor = HSSFColor.RED.index;
+                    //CellRangeAddress[] range =
+                    //{
+                    //    new CellRangeAddress(9,12,0,0)
+                    //};
+                    //cf.AddConditionalFormatting(range, rule);
+                    #endregion configurar formatacao condicional
+
+                }
+            }
+        }
+
+        private static void ApplyCellStyle(HSSFSheet sheet, int firstRow, int firstCell, int rows, int cells, HSSFCellStyle style)
+        {
+            for (int r = firstRow; r < (rows+firstRow); r++)
+            {
+                for (int c = firstCell; c < (cells+firstCell); c++)
+                {
+                    sheet.GetRow(r).GetCell(c).CellStyle = style;
                 }
             }
         }
@@ -98,9 +139,7 @@ namespace SpreadsheetFactory
             {
                 if (item.Cells == null)
                 {
-                    sheet.GetRow(cellRow)
-                        .GetCell(headerCell)
-                        .SetCellValue(item.Text);
+                    sheet.GetRow(cellRow).GetCell(headerCell).SetCellValue(item.Text);
 
                     //mesclar linhas
                     sheet.AddMergedRegion(new CellRangeAddress(cellRow, sheet.LastRowNum - 1, headerCell, headerCell + item.SpanSize));
@@ -108,9 +147,7 @@ namespace SpreadsheetFactory
                 }
                 else if (item.Cells != null)
                 {
-                    sheet.GetRow(cellRow)
-                        .GetCell(headerCell)
-                        .SetCellValue(item.Text);
+                    sheet.GetRow(cellRow).GetCell(headerCell).SetCellValue(item.Text);
 
                     int headerCellAux = headerCell + item.Cells.Count - 1;
 
@@ -122,10 +159,13 @@ namespace SpreadsheetFactory
                     {
                         if (internItem.Cells == null || internItem.Cells.Count == 0)
                         {
-                            sheet.GetRow(cellRow + 1)
-                                .GetCell(headerCell)
-                                .SetCellValue(internItem.Text);
+                            sheet.GetRow(cellRow + 1).GetCell(headerCell).SetCellValue(internItem.Text);
                             //mesclar linhas
+                            int rowAux = cellRow + 1;
+                            if (rowAux > (sheet.LastRowNum - 1))
+                            {
+                                rowAux = sheet.LastRowNum - 1;
+                            }
                             sheet.AddMergedRegion(new CellRangeAddress(cellRow + 1, sheet.LastRowNum - 1, headerCell, headerCell));
                             headerCell++;
                             callRecursive = false;
@@ -150,13 +190,14 @@ namespace SpreadsheetFactory
 
         private static void CreateHeaderCells(HSSFSheet sheet, int firstCell)
         {
-            for (int i = tableHeaderRows + 1; i > 0; i--)
+            for (int i = 1; i < tableHeaderRows+1; i++)
             {
-                for (int j = firstCell; j < tableHeaderCells + firstCell; j++)
+                for (int j = firstCell; j < _tableHeaderCells + firstCell; j++)
                 {
                     //sheet.GetRow(sheet.LastRowNum - i).CreateCell(j).SetCellValue(i + ":" + j);
                     sheet.GetRow(sheet.LastRowNum - i).CreateCell(j);
                 }
+                Console.WriteLine(sheet.LastRowNum - i);
             }
         }
 
@@ -164,9 +205,10 @@ namespace SpreadsheetFactory
         {
             for (int i = sheet.LastRowNum; i < firstRow + rows; i++)
             {
+                sheet.CreateRow(i);
                 for (int j = firstCell; j < firstCell + cells; j++)
                 {
-                    sheet.CreateRow(i).CreateCell(j).SetCellValue("A");
+                    sheet.GetRow(i).CreateCell(j).SetCellValue("A");
                 }
             }
         }
@@ -175,6 +217,7 @@ namespace SpreadsheetFactory
         {
             int row = firstRow;
             object propValue;
+            
             foreach (var item in values)
             {
                 for (int i = firstCell; i < properties.Length; i++)
@@ -192,7 +235,6 @@ namespace SpreadsheetFactory
                             sheet.GetRow(row).GetCell(i).SetCellValue(((DateTime)propValue).ToShortDateString());
                             break;
                     }
-                    //sheet.GetRow(row).GetCell(i).SetCellValue("A");
                 }
                 row++;
             }
@@ -209,7 +251,7 @@ namespace SpreadsheetFactory
             {
                 if (item.Cells == null || item.Cells.Count == 0)
                 {
-                    tableHeaderCells++;
+                    _tableHeaderCells++;
                 }
                 else
                 {
@@ -274,6 +316,8 @@ namespace SpreadsheetFactory
             fs.Write(ms.ToArray(), 0, Convert.ToInt32(ms.Length));
             fs.Close();
             ms.Close();
+
+            _workbook=null;
         }
     }
     public class Pessoa
