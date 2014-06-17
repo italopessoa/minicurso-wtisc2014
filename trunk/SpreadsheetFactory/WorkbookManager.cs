@@ -54,10 +54,12 @@ namespace SpreadsheetFactory
             if (spreadsheetFactory != null)
             {
                 HSSFSheet sheet = null;
+                HSSFPatriarch drawingPatriarch = null;
                 if (spreadsheetFactory.Header != null)
                 {
                     sheet = CreateTitle(spreadsheetFactory.Header.Title, spreadsheetFactory.Header.SheetName);
-
+                    drawingPatriarch = sheet.CreateDrawingPatriarch();
+                    
                     if (spreadsheetFactory.Header.Filters != null && spreadsheetFactory.Header.Filters.Count > 0)
                     {
                         sheet = ConfigHeader(sheet, spreadsheetFactory.Header.Filters);
@@ -73,7 +75,7 @@ namespace SpreadsheetFactory
 
                     if (_headerCellStyle != null)
                     {
-                        ApplyCellStyle(sheet, firstRow, cellAux, tableHeaderRows, _tableHeaderCells,_headerCellStyle);
+                        ApplyHeaderCellStyle(sheet, firstRow, cellAux, tableHeaderRows, _tableHeaderCells, _headerCellStyle);
                     }
 
                 }
@@ -91,7 +93,7 @@ namespace SpreadsheetFactory
 
                     if(_defaultContentCellStyle !=null)
                     {
-                        ApplyCellStyle(sheet, firstRow, 0, spreadsheetFactory.Datasource.Count, spreadsheetFactory.Properties.Length,_defaultContentCellStyle);
+                        ApplyContentListCellStyle(sheet, firstRow, 0, spreadsheetFactory.Datasource.Count, spreadsheetFactory.Properties.Length, _defaultContentCellStyle, drawingPatriarch);
                     }
 
                     #region configurar formatacao condicional
@@ -111,7 +113,7 @@ namespace SpreadsheetFactory
             }
         }
 
-        private static void ApplyCellStyle(HSSFSheet sheet, int firstRow, int firstCell, int rows, int cells, HSSFCellStyle style)
+        private static void ApplyHeaderCellStyle(HSSFSheet sheet, int firstRow, int firstCell, int rows, int cells, HSSFCellStyle style)
         {
             for (int r = firstRow; r < (rows+firstRow); r++)
             {
@@ -120,6 +122,29 @@ namespace SpreadsheetFactory
                     sheet.GetRow(r).GetCell(c).CellStyle = style;
                 }
             }
+        }
+
+        private static void ApplyContentListCellStyle(HSSFSheet sheet, int firstRow, int firstCell, int rows, int cells, HSSFCellStyle style, HSSFPatriarch drawingPatriarch)
+        {
+            for (int r = firstRow; r < (rows + firstRow); r++)
+            {
+                for (int c = firstCell; c < (cells + firstCell); c++)
+                {
+                    sheet.GetRow(r).GetCell(c).CellStyle = style;
+                }
+            }
+        }
+
+        private static void AddConditionalFormatComment(HSSFSheet sheet, HSSFCell cell, string comment)
+        {
+            /*HSSFPatriarch patr = sheet.DrawingPatriarch CreateDrawingPatriarch();
+            //anchor defines size and position of the comment in worksheet
+            //row1 linha final do comentario, 1 pe como um valor padrao para a altura do comentario
+            //col2 é a quantidade de colunas que o comentario irá abranger
+            //row2 é a quantidade de linhas que o comentario tem
+            HSSFComment comment1 = patr.CreateComment(new HSSFClientAnchor(100, 100, 100, 100, (short)1, 1, (short)6, 5));
+            comment1.String = new HSSFRichTextString("FirstComments");
+            sheet.GetRow(r).GetCell(c).CellComment = comment1;*/
         }
 
         private static void PrepareTableHeader(HSSFSheet sheet, IList<TableHeader> tableHeaders, int cell)

@@ -10,7 +10,7 @@ namespace SpreadsheetFactory.Test
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main2(string[] args)
         {
             Header header = new Header();
             header.AddFilter("Valor", 10.3);
@@ -282,10 +282,47 @@ namespace SpreadsheetFactory.Test
             WorkbookManager.CreateSpreadsheet(spf);
             //Console.WriteLine("FIM");
             //Console.ReadKey();
-            WorkbookManager.SaveSpreadsheet("", DateTime.Now.ToString().Replace("/", "").Replace(":","").Replace(" ","")+".xls");
+            WorkbookManager.SaveSpreadsheet("", DateTime.Now.ToString().Replace("/", "").Replace(":", "").Replace(" ", "") + ".xls");
+        }
+
+        static void Main(string[] args)
+        {
+            //HSSFWorkbook wb = new HSSFWorkbook(); //or new HSSFWorkbook();
+
+            //CreationHelper factory = wb.cre getCreationHelper();
+
+            //Sheet sheet = wb.createSheet();
+
+            //Rowl row  = sheet.createRow(3);
+            //Cell cell = row.createCell(5);
+            //cell.setCellValue("F4");
+
+            //Drawing drawing = sheet.createDrawingPatriarch();
+
+            //// When the comment box is visible, have it show in a 1x3 space
+            //ClientAnchor anchor = factory.createClientAnchor();
+            //anchor.setCol1(cell.getColumnIndex());
+            //anchor.setCol2(cell.getColumnIndex()+1);
+            //anchor.setRow1(row.getRowNul());
+            //anchor.setRow2(row.getRowNul()+3);
+
+            //// Create the comment and set the text+author
+            //Comment comment = drawing.createCellComment(anchor);
+            //RichTextString str = factory.createRichTextString("Hello, World!");
+            //comment.setString(str);
+            //comment.setAuthor("Apache POI");
+
+            //// Assign the comment to the cell
+            //cell.setCellComment(comment);
+
+            //String fname = "comment-xssf.xls";
+            //if(wb instanceof XSSFWorkbook) fname += "x";
+            //FileOutputStream out = new FileOutputStream(fname);
+            //wb.write(out);
+            //out.close();
         }
     }
 
-   
+
 }
 
