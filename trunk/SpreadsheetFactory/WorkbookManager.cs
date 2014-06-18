@@ -1,4 +1,5 @@
-﻿using NPOI.HSSF.UserModel;
+﻿using NPOI.HSSF.Record;
+using NPOI.HSSF.UserModel;
 using NPOI.HSSF.Util;
 using System;
 using System.Collections.Generic;
@@ -47,11 +48,11 @@ namespace SpreadsheetFactory
                 });
             }else
             {
-                if(_conditionalFormatDictionary[property] == null)
-                {
+                //if(_conditionalFormatDictionary[property] == null)
+                //{
                     _conditionalFormatDictionary[property] = new List<ConditionalFormattingTemplate>();
                     _conditionalFormatDictionary[property].Add(format);
-                }
+                //}
             }
         }
 
@@ -117,7 +118,7 @@ namespace SpreadsheetFactory
                     CreateContentTableCells(sheet, spreadsheetFactory.Datasource.Count, spreadsheetFactory.Datasource.Count, 0, firstRow);
                     SetContentTableCellsValue(sheet, firstRow, 0, spreadsheetFactory.Properties, spreadsheetFactory.Datasource);
 
-                    if(_defaultContentCellStyle !=null)
+                    if (_conditionalFormatDictionary != null)
                     {
                         List<PropertyCell> teste = new List<PropertyCell>();
                         for (int i = 0; i < spreadsheetFactory.Properties.Length; i++)
@@ -129,6 +130,7 @@ namespace SpreadsheetFactory
                         }
 
                         ApplyContentListCellStyle(sheet, firstRow, 0, spreadsheetFactory.Datasource.Count, spreadsheetFactory.Properties.Length, _defaultContentCellStyle, drawingPatriarch);
+                        ApplyConditinalFormattingContentTable(sheet, firstRow, spreadsheetFactory.Datasource.Count, 0, spreadsheetFactory.Properties.Length + 0, teste);
                     }
 
                     #region configurar formatacao condicional
@@ -169,6 +171,151 @@ namespace SpreadsheetFactory
                 }
             }
         }
+
+        private static void ApplyConditinalFormattingContentTable(HSSFSheet sheet, int firstRow, int rows, int firstCell,int lastCell, List<PropertyCell> cellPoints)
+        {
+            for (int r = firstRow; r < (firstRow+rows); r++)
+            {
+                HSSFCellStyle style = TesteA(sheet.GetRow(r), cellPoints);
+
+                for (int c = firstCell; c < lastCell; c++)
+                {
+                    sheet.GetRow(r).GetCell(c).CellStyle = style;
+                }
+            }
+        }
+
+        private static HSSFCellStyle TesteA(HSSFRow row, List<PropertyCell> cellPoints)
+        {
+            ConditionalFormattingTemplate template = null;
+            foreach (var item in cellPoints)
+            {
+                foreach (var style in _conditionalFormatDictionary[item.PropertyName])
+	            {
+                    if (IsMatchStyle(style, row.GetCell(item.CellIndex)))
+                    {
+                        if (template != null)
+                        {
+                            if (style.Priority < template.Priority)
+                            {
+                                template = style;
+                            }
+                            else
+                            {
+                                template = style;
+                            }
+                        }
+                        else
+                        {
+                            template = style;
+                        }
+                    }
+                }
+            }
+            if (template != null)
+            {
+                return template.CellStyle;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        private static bool IsMatchStyle(ConditionalFormattingTemplate cft, HSSFCell cell)
+        {
+            switch (cell.CellType)
+            {
+                case NPOI.HSSF.UserModel.HSSFCell.CELL_TYPE_NUMERIC:
+                    break;
+                case NPOI.HSSF.UserModel.HSSFCell.CELL_TYPE_STRING:
+                    break;
+                case SheetUtil.CELL_TYPE_DATETIME:
+                    break;
+            }
+
+            // >, <, ==, empty, null
+            switch (cft.ComparisonOperator)
+            {
+                case ComparisonOperator.BETWEEN:
+                    break;
+                case ComparisonOperator.EQUAL: //igual
+                    switch (cell.CellType)
+                    {
+                        case NPOI.HSSF.UserModel.HSSFCell.CELL_TYPE_NUMERIC:
+                            double na = cell.NumericCellValue;
+                            double nb;
+                            double.TryParse(cft.Value.ToString(), out nb);
+                            return na == nb;
+                        case NPOI.HSSF.UserModel.HSSFCell.CELL_TYPE_STRING:
+                            string sa = cell.StringCellValue;
+                            string sb = (string)cft.Value;
+                            return sa.Equals(sb);
+                        case SheetUtil.CELL_TYPE_DATETIME:
+                            DateTime da = cell.DateCellValue;
+                            DateTime db = (DateTime)cft.Value;
+                            return da == db;
+                    }
+                    break;
+                case ComparisonOperator.GE: 
+                    break;
+                case ComparisonOperator.GT: //maior
+                    switch (cell.CellType)
+                    {
+                        case NPOI.HSSF.UserModel.HSSFCell.CELL_TYPE_NUMERIC:
+                            double na = cell.NumericCellValue;
+                            double nb;
+                            double.TryParse(cft.Value.ToString(), out nb);
+                            return na > nb;
+                        case SheetUtil.CELL_TYPE_DATETIME:
+                            DateTime da = cell.DateCellValue;
+                            DateTime db = (DateTime)cft.Value;
+                            return da > db;
+                    }
+                    break;
+                case ComparisonOperator.LE:
+                    break;
+                case ComparisonOperator.LT: //menor
+                    switch (cell.CellType)
+                    {
+                        case NPOI.HSSF.UserModel.HSSFCell.CELL_TYPE_NUMERIC:
+                            double na = cell.NumericCellValue;
+                            double nb;
+                            double.TryParse(cft.Value.ToString(), out nb);
+                            return na < nb;
+                        case SheetUtil.CELL_TYPE_DATETIME:
+                            DateTime da = cell.DateCellValue;
+                            DateTime db = (DateTime)cft.Value;
+                            return da < db;
+                    }
+                    break;
+                case ComparisonOperator.NOT_BETWEEN:
+                    break;
+                case ComparisonOperator.NOT_EQUAL:
+                    break;
+                case ComparisonOperator.NO_COMPARISON:
+                    break;
+                default:
+                    break;
+            }
+
+            return false;
+            
+        }
+
+        //private static HSSFCellStyle GetConditionalStyle(List<PropertyCell> cellPoints)
+        //{
+        //    int maxPriority = 0;
+        //    int cellToComment = 0;
+
+        //    foreach (var item in cellPoints)
+        //    {
+        //        foreach (var s in _conditionalFormatDictionary[item.PropertyName])
+        //        {
+        //            s.Priority = (s.Priority > maxPriority ? s.Priority : maxPriority);
+        //        }
+        //    }
+        //}
 
         private static void AddConditionalFormatComment(HSSFSheet sheet, HSSFCell cell, string comment)
         {
