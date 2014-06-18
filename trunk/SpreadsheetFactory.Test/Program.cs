@@ -1,6 +1,7 @@
 ﻿using NPOI.HSSF.UserModel;
 using NPOI.HSSF.Util;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -320,6 +321,13 @@ namespace SpreadsheetFactory.Test
             //FileOutputStream out = new FileOutputStream(fname);
             //wb.write(out);
             //out.close();
+
+            IDictionary<string, List<ConditionalFormattingTemplate>> b = new Dictionary<string, List<ConditionalFormattingTemplate>>();
+            b["aaq"].Sort(delegate(ConditionalFormattingTemplate a, ConditionalFormattingTemplate i)
+            { return a.Priority.CompareTo(i.Priority); });
+
+            ConditionalFormattingTemplate de = new ConditionalFormattingTemplate();
+
         }
     }
 

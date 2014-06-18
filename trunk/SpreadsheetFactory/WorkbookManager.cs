@@ -21,11 +21,37 @@ namespace SpreadsheetFactory
 
         private static HSSFCellStyle _defaultContentCellStyle = null;
 
+        private static IDictionary<string, List<ConditionalFormattingTemplate>> _conditionalFormatDictionary;
+
         static WorkbookManager()
         {
             if (_workbook == null)
             {
                 _workbook = new HSSFWorkbook();
+            }
+        }
+
+        public static void AddConditionalFormatting(string property, ConditionalFormattingTemplate format)
+        {
+            if (_conditionalFormatDictionary == null)
+            {
+                _conditionalFormatDictionary = new Dictionary<string, List<ConditionalFormattingTemplate>>();
+            }
+
+            if (_conditionalFormatDictionary.Keys.Contains(property))
+            {
+                _conditionalFormatDictionary[property].Add(format);
+                _conditionalFormatDictionary[property].Sort(delegate(ConditionalFormattingTemplate a, ConditionalFormattingTemplate b)
+                { 
+                    return a.Priority.CompareTo(b.Priority); 
+                });
+            }else
+            {
+                if(_conditionalFormatDictionary[property] == null)
+                {
+                    _conditionalFormatDictionary[property] = new List<ConditionalFormattingTemplate>();
+                    _conditionalFormatDictionary[property].Add(format);
+                }
             }
         }
 
@@ -93,6 +119,15 @@ namespace SpreadsheetFactory
 
                     if(_defaultContentCellStyle !=null)
                     {
+                        List<PropertyCell> teste = new List<PropertyCell>();
+                        for (int i = 0; i < spreadsheetFactory.Properties.Length; i++)
+                        {
+                            if (_conditionalFormatDictionary.Keys.Contains(spreadsheetFactory.Properties[i]))
+                            {
+                                teste.Add(new PropertyCell() { CellIndex = i, PropertyName = spreadsheetFactory.Properties[i] });
+                            }
+                        }
+
                         ApplyContentListCellStyle(sheet, firstRow, 0, spreadsheetFactory.Datasource.Count, spreadsheetFactory.Properties.Length, _defaultContentCellStyle, drawingPatriarch);
                     }
 
@@ -343,6 +378,12 @@ namespace SpreadsheetFactory
             ms.Close();
 
             _workbook=null;
+        }
+ 
+        internal struct PropertyCell
+        {
+            public int CellIndex { get; set; }
+            public string PropertyName { get; set; }
         }
     }
     public class Pessoa
