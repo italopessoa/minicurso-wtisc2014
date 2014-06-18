@@ -6,5 +6,3 @@ c:\users\italo.pessoa\documents\visual studio 2013\Projects\SpreadsheetFactory\S
 c:\users\italo.pessoa\documents\visual studio 2013\Projects\SpreadsheetFactory\SpreadsheetFactory.Test\obj\Debug\SpreadsheetFactory.Test.csprojResolveAssemblyReference.cache
 c:\users\italo.pessoa\documents\visual studio 2013\Projects\SpreadsheetFactory\SpreadsheetFactory.Test\obj\Debug\SpreadsheetFactory.Test.exe
 c:\users\italo.pessoa\documents\visual studio 2013\Projects\SpreadsheetFactory\SpreadsheetFactory.Test\obj\Debug\SpreadsheetFactory.Test.pdb
-E:\SVN\WTISC2014\trunk\SpreadsheetFactory.Test\bin\Debug\NPOI.HSSF.dll
-E:\SVN\WTISC2014\trunk\SpreadsheetFactory.Test\bin\Debug\NPOI.DDF.dll
