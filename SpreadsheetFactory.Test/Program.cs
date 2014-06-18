@@ -11,7 +11,7 @@ namespace SpreadsheetFactory.Test
 {
     class Program
     {
-        static void Main2(string[] args)
+        static void Main(string[] args)
         {
             Header header = new Header();
             header.AddFilter("Valor", 10.3);
@@ -280,13 +280,46 @@ namespace SpreadsheetFactory.Test
 
             WorkbookManager.SetDefaultContentCellStyle(contentStyle);
 
+
+            HSSFCellStyle templateStyle = WorkbookManager.GetNewHSSFCellStyle();
+            templateStyle.BorderTop = 2;
+            templateStyle.BorderRight = 2;
+            templateStyle.BorderRight = 2;
+            templateStyle.BorderBottom = 2;
+            templateStyle.FillPattern = HSSFCellStyle.SOLID_FOREGROUND;
+            templateStyle.FillForegroundColor = HSSFColor.GREEN.index;
+
+            HSSFCellStyle templateStyle2 = WorkbookManager.GetNewHSSFCellStyle();
+            templateStyle2.BorderTop = 1;
+            templateStyle2.BorderRight = 1;
+            templateStyle2.BorderRight = 1;
+            templateStyle2.BorderBottom = 1;
+            templateStyle2.FillPattern = HSSFCellStyle.SOLID_FOREGROUND;
+            templateStyle2.FillForegroundColor = HSSFColor.YELLOW.index;
+
+
+            ConditionalFormattingTemplate template = new ConditionalFormattingTemplate();
+            template.Priority = 1;
+            template.ComparisonOperator = NPOI.HSSF.Record.ComparisonOperator.GT;
+            template.PropertyName = "Salario";
+            template.Value = 1;
+            template.CellStyle = templateStyle;
+            WorkbookManager.AddConditionalFormatting("Salario",template);
+
+            ConditionalFormattingTemplate template2 = new ConditionalFormattingTemplate();
+            template2.Priority = 2;
+            template2.ComparisonOperator = NPOI.HSSF.Record.ComparisonOperator.LT;
+            template2.PropertyName = "Idade";
+            template2.Value = 20;
+            template2.CellStyle = templateStyle2;
+            WorkbookManager.AddConditionalFormatting("Idade", template2);
             WorkbookManager.CreateSpreadsheet(spf);
             //Console.WriteLine("FIM");
             //Console.ReadKey();
             WorkbookManager.SaveSpreadsheet("", DateTime.Now.ToString().Replace("/", "").Replace(":", "").Replace(" ", "") + ".xls");
         }
 
-        static void Main(string[] args)
+        static void Mai2n(string[] args)
         {
             //HSSFWorkbook wb = new HSSFWorkbook(); //or new HSSFWorkbook();
 
