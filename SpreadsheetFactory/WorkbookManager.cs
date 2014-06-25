@@ -43,15 +43,16 @@ namespace SpreadsheetFactory
             {
                 _conditionalFormatDictionary[property].Add(format);
                 _conditionalFormatDictionary[property].Sort(delegate(ConditionalFormattingTemplate a, ConditionalFormattingTemplate b)
-                { 
-                    return a.Priority.CompareTo(b.Priority); 
+                {
+                    return a.Priority.CompareTo(b.Priority);
                 });
-            }else
+            }
+            else
             {
                 //if(_conditionalFormatDictionary[property] == null)
                 //{
-                    _conditionalFormatDictionary[property] = new List<ConditionalFormattingTemplate>();
-                    _conditionalFormatDictionary[property].Add(format);
+                _conditionalFormatDictionary[property] = new List<ConditionalFormattingTemplate>();
+                _conditionalFormatDictionary[property].Add(format);
                 //}
             }
         }
@@ -66,6 +67,10 @@ namespace SpreadsheetFactory
             return _workbook.CreateFont();
         }
 
+        public static HSSFDataFormat GetNewHSSFDataFormat()
+        {
+            return _workbook.CreateDataFormat();
+        }
         public static void SetHeaderCellStyle(HSSFCellStyle cellStyle)
         {
             _headerCellStyle = cellStyle;
@@ -86,7 +91,7 @@ namespace SpreadsheetFactory
                 {
                     sheet = CreateTitle(spreadsheetFactory.Header.Title, spreadsheetFactory.Header.SheetName);
                     drawingPatriarch = sheet.CreateDrawingPatriarch();
-                    
+
                     if (spreadsheetFactory.Header.Filters != null && spreadsheetFactory.Header.Filters.Count > 0)
                     {
                         sheet = ConfigHeader(sheet, spreadsheetFactory.Header.Filters);
@@ -129,7 +134,7 @@ namespace SpreadsheetFactory
                             }
                         }
 
-                        ApplyContentListCellStyle(sheet, firstRow, 0, spreadsheetFactory.Datasource.Count, spreadsheetFactory.Properties.Length, _defaultContentCellStyle, drawingPatriarch);
+                        //ApplyContentListCellStyle(sheet, firstRow, 0, spreadsheetFactory.Datasource.Count, spreadsheetFactory.Properties.Length, _defaultContentCellStyle, drawingPatriarch);
                         ApplyConditinalFormattingContentTable(sheet, firstRow, spreadsheetFactory.Datasource.Count, 0, spreadsheetFactory.Properties.Length + 0, teste);
                     }
 
@@ -152,17 +157,6 @@ namespace SpreadsheetFactory
 
         private static void ApplyHeaderCellStyle(HSSFSheet sheet, int firstRow, int firstCell, int rows, int cells, HSSFCellStyle style)
         {
-            for (int r = firstRow; r < (rows+firstRow); r++)
-            {
-                for (int c = firstCell; c < (cells+firstCell); c++)
-                {
-                    sheet.GetRow(r).GetCell(c).CellStyle = style;
-                }
-            }
-        }
-
-        private static void ApplyContentListCellStyle(HSSFSheet sheet, int firstRow, int firstCell, int rows, int cells, HSSFCellStyle style, HSSFPatriarch drawingPatriarch)
-        {
             for (int r = firstRow; r < (rows + firstRow); r++)
             {
                 for (int c = firstCell; c < (cells + firstCell); c++)
@@ -172,37 +166,59 @@ namespace SpreadsheetFactory
             }
         }
 
-        private static void ApplyConditinalFormattingContentTable(HSSFSheet sheet, int firstRow, int rows, int firstCell,int lastCell, List<PropertyCell> cellPoints)
+        private static void ApplyContentListCellStyle(HSSFSheet sheet, int firstRow, int firstCell, int rows, int cells, HSSFCellStyle style, HSSFPatriarch drawingPatriarch)
         {
-            for (int r = firstRow; r < (firstRow+rows); r++)
-            {
-                HSSFCellStyle style = TesteA(sheet.GetRow(r), cellPoints);
+            HSSFCellStyle templateStyle23 = WorkbookManager.GetNewHSSFCellStyle();
+            templateStyle23.BorderTop = 2;
+            templateStyle23.BorderRight = 2;
+            templateStyle23.BorderRight = 2;
+            templateStyle23.BorderBottom = 2;
+            templateStyle23.FillPattern = HSSFCellStyle.SOLID_FOREGROUND;
+            templateStyle23.FillForegroundColor = HSSFColor.PINK.index;
 
-                for (int c = firstCell; c < lastCell; c++)
+            for (int r = firstRow; r < (rows + firstRow); r++)
+            {
+                for (int c = firstCell; c < (cells + firstCell); c++)
                 {
-                    sheet.GetRow(r).GetCell(c).CellStyle = style;
+                    sheet.GetRow(r).RowStyle = templateStyle23;
                 }
             }
         }
 
-        private static HSSFCellStyle TesteA(HSSFRow row, List<PropertyCell> cellPoints)
+        private static void ApplyConditinalFormattingContentTable(HSSFSheet sheet, int firstRow, int rows, int firstCell, int lastCell, List<PropertyCell> cellPoints)
+        {
+            for (int r = firstRow; r < (firstRow + rows); r++)
+            {
+                RowStyle style = TesteA(sheet.GetRow(r), cellPoints);
+
+                if (style != null)
+                {
+                    ApplyRowStyle(sheet.GetRow(r), style);
+                }
+
+                //for (int c = firstCell; c < lastCell; c++)
+                //{
+                //    .GetCell(c).CellStyle = style;
+                //}
+            }
+        }
+
+        private static RowStyle TesteA(HSSFRow row, List<PropertyCell> cellPoints)
         {
             ConditionalFormattingTemplate template = null;
             foreach (var item in cellPoints)
             {
                 foreach (var style in _conditionalFormatDictionary[item.PropertyName])
-	            {
+                {
                     if (IsMatchStyle(style, row.GetCell(item.CellIndex)))
                     {
                         if (template != null)
                         {
-                            if (style.Priority < template.Priority)
+                            if (style.Priority > template.Priority)
                             {
+                                //System.Diagnostics.Debug.WriteLine("A: "+template.RowStyle.RowStyleName + ">" + template.RowStyle.RowForegroundColor);
                                 template = style;
-                            }
-                            else
-                            {
-                                template = style;
+                                //System.Diagnostics.Debug.WriteLine("D: "+template.RowStyle.RowStyleName + ">" + template.RowStyle.RowForegroundColor);
                             }
                         }
                         else
@@ -214,7 +230,8 @@ namespace SpreadsheetFactory
             }
             if (template != null)
             {
-                return template.CellStyle;
+                //System.Diagnostics.Debug.WriteLine(template.RowStyle.RowStyleName + ">" + template.RowStyle.RowForegroundColor);
+                return template.RowStyle;
             }
             else
             {
@@ -224,6 +241,8 @@ namespace SpreadsheetFactory
 
         private static bool IsMatchStyle(ConditionalFormattingTemplate cft, HSSFCell cell)
         {
+            int CELL_TYPE_INDEX = SheetUtil.GetCellType(cft.Value);
+
             switch (cell.CellType)
             {
                 case NPOI.HSSF.UserModel.HSSFCell.CELL_TYPE_NUMERIC:
@@ -240,7 +259,7 @@ namespace SpreadsheetFactory
                 case ComparisonOperator.BETWEEN:
                     break;
                 case ComparisonOperator.EQUAL: //igual
-                    switch (cell.CellType)
+                    switch (CELL_TYPE_INDEX)
                     {
                         case NPOI.HSSF.UserModel.HSSFCell.CELL_TYPE_NUMERIC:
                             double na = cell.NumericCellValue;
@@ -257,10 +276,10 @@ namespace SpreadsheetFactory
                             return da == db;
                     }
                     break;
-                case ComparisonOperator.GE: 
+                case ComparisonOperator.GE:
                     break;
                 case ComparisonOperator.GT: //maior
-                    switch (cell.CellType)
+                    switch (CELL_TYPE_INDEX)
                     {
                         case NPOI.HSSF.UserModel.HSSFCell.CELL_TYPE_NUMERIC:
                             double na = cell.NumericCellValue;
@@ -276,7 +295,7 @@ namespace SpreadsheetFactory
                 case ComparisonOperator.LE:
                     break;
                 case ComparisonOperator.LT: //menor
-                    switch (cell.CellType)
+                    switch (CELL_TYPE_INDEX)
                     {
                         case NPOI.HSSF.UserModel.HSSFCell.CELL_TYPE_NUMERIC:
                             double na = cell.NumericCellValue;
@@ -300,7 +319,7 @@ namespace SpreadsheetFactory
             }
 
             return false;
-            
+
         }
 
         //private static HSSFCellStyle GetConditionalStyle(List<PropertyCell> cellPoints)
@@ -397,7 +416,7 @@ namespace SpreadsheetFactory
 
         private static void CreateHeaderCells(HSSFSheet sheet, int firstCell)
         {
-            for (int i = 1; i < tableHeaderRows+1; i++)
+            for (int i = 1; i < tableHeaderRows + 1; i++)
             {
                 for (int j = firstCell; j < _tableHeaderCells + firstCell; j++)
                 {
@@ -415,7 +434,7 @@ namespace SpreadsheetFactory
                 sheet.CreateRow(i);
                 for (int j = firstCell; j < firstCell + cells; j++)
                 {
-                    sheet.GetRow(i).CreateCell(j).SetCellValue("A");
+                    sheet.GetRow(i).CreateCell(j);//.SetCellValue("A");
                 }
             }
         }
@@ -424,7 +443,7 @@ namespace SpreadsheetFactory
         {
             int row = firstRow;
             object propValue;
-            
+
             foreach (var item in values)
             {
                 for (int i = firstCell; i < properties.Length; i++)
@@ -432,14 +451,14 @@ namespace SpreadsheetFactory
                     propValue = GetPropValue(item, properties[i]);
                     switch (SheetUtil.GetCellType(propValue))
                     {
-                        case HSSFCell.CELL_TYPE_NUMERIC:
-                            sheet.GetRow(row).GetCell(i).SetCellValue(double.Parse(propValue.ToString()));
+                        case HSSFCell. CELL_TYPE_NUMERIC:
+                            sheet.GetRow(row).GetCell(i).SetCellValue( double.Parse(propValue.ToString()));
                             break;
                         case HSSFCell.CELL_TYPE_STRING:
                             sheet.GetRow(row).GetCell(i).SetCellValue(propValue.ToString());
                             break;
                         case SheetUtil.CELL_TYPE_DATETIME:
-                            sheet.GetRow(row).GetCell(i).SetCellValue(((DateTime)propValue).ToShortDateString());
+                            sheet.GetRow(row).GetCell(i).SetCellValue(((DateTime)propValue));
                             break;
                     }
                 }
@@ -524,15 +543,25 @@ namespace SpreadsheetFactory
             fs.Close();
             ms.Close();
 
-            _workbook=null;
+            _workbook = null;
         }
- 
+
+        private static void ApplyRowStyle(HSSFRow row, RowStyle rowStyle)
+        {
+            foreach (KeyValuePair<int, HSSFCellStyle> style in rowStyle.CellStyles)
+            {
+                System.Diagnostics.Debug.WriteLine("XXXXXXXXXX >>>> "+rowStyle.RowStyleName + ">" + rowStyle.RowForegroundColor);
+                row.GetCell(style.Key + row.FirstCellNum).CellStyle = style.Value;
+            }
+        }
+
         internal struct PropertyCell
         {
             public int CellIndex { get; set; }
             public string PropertyName { get; set; }
         }
     }
+
     public class Pessoa
     {
         public string Nome { get; set; }
