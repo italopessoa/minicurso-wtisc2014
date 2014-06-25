@@ -12,5 +12,6 @@ namespace SpreadsheetFactory
         public NPOI.HSSF.Record.ComparisonOperator ComparisonOperator { get; set; }
         public NPOI.HSSF.UserModel.HSSFCellStyle CellStyle { get; set; }
         public int Priority { get; set; }
+        public RowStyle RowStyle { get; set; }
     }
 }
