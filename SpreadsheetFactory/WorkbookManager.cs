@@ -10,7 +10,9 @@ namespace SpreadsheetFactory
 {
     public class WorkbookManager
     {
-        protected static int tableHeaderRows = 0;
+        #region Private Members
+
+        private static int tableHeaderRows = 0;
 
         private static int _tableHeaderCells = 0;
 
@@ -22,15 +24,13 @@ namespace SpreadsheetFactory
 
         private static HSSFCellStyle _defaultContentCellStyle = null;
 
+        private static RowStyle _defaultContentRowStyle = null;
+
         private static IDictionary<string, List<ConditionalFormattingTemplate>> _conditionalFormatDictionary;
 
-        static WorkbookManager()
-        {
-            if (_workbook == null)
-            {
-                _workbook = new HSSFWorkbook();
-            }
-        }
+        #endregion Private Members
+
+        #region Public Methods
 
         public static void AddConditionalFormatting(string property, ConditionalFormattingTemplate format)
         {
@@ -49,11 +49,8 @@ namespace SpreadsheetFactory
             }
             else
             {
-                //if(_conditionalFormatDictionary[property] == null)
-                //{
                 _conditionalFormatDictionary[property] = new List<ConditionalFormattingTemplate>();
                 _conditionalFormatDictionary[property].Add(format);
-                //}
             }
         }
 
@@ -71,6 +68,7 @@ namespace SpreadsheetFactory
         {
             return _workbook.CreateDataFormat();
         }
+
         public static void SetHeaderCellStyle(HSSFCellStyle cellStyle)
         {
             _headerCellStyle = cellStyle;
@@ -79,6 +77,11 @@ namespace SpreadsheetFactory
         public static void SetDefaultContentCellStyle(HSSFCellStyle cellStyle)
         {
             _defaultContentCellStyle = cellStyle;
+        }
+
+        public static void SetDefaultContentRowStyle(RowStyle rowStyle)
+        {
+            _defaultContentRowStyle = rowStyle;
         }
 
         public static void CreateSpreadsheet(SpreadsheetFactory spreadsheetFactory)
@@ -134,26 +137,15 @@ namespace SpreadsheetFactory
                             }
                         }
 
-                        //ApplyContentListCellStyle(sheet, firstRow, 0, spreadsheetFactory.Datasource.Count, spreadsheetFactory.Properties.Length, _defaultContentCellStyle, drawingPatriarch);
                         ApplyConditinalFormattingContentTable(sheet, firstRow, spreadsheetFactory.Datasource.Count, 0, spreadsheetFactory.Properties.Length + 0, teste);
                     }
-
-                    #region configurar formatacao condicional
-                    //HSSFSheetConditionalFormatting cf = sheet.SheetConditionalFormatting;
-                    //HSSFConditionalFormattingRule rule = cf.CreateConditionalFormattingRule(NPOI.HSSF.Record.ComparisonOperator.GE, "3", null);
-
-                    //HSSFPatternFormatting patternFmt = rule.CreatePatternFormatting();
-                    //patternFmt.FillBackgroundColor = HSSFColor.RED.index;
-                    //CellRangeAddress[] range =
-                    //{
-                    //    new CellRangeAddress(9,12,0,0)
-                    //};
-                    //cf.AddConditionalFormatting(range, rule);
-                    #endregion configurar formatacao condicional
-
                 }
             }
         }
+
+        #endregion Public Methods
+
+        #region Private Methods
 
         private static void ApplyHeaderCellStyle(HSSFSheet sheet, int firstRow, int firstCell, int rows, int cells, HSSFCellStyle style)
         {
@@ -166,44 +158,24 @@ namespace SpreadsheetFactory
             }
         }
 
-        private static void ApplyContentListCellStyle(HSSFSheet sheet, int firstRow, int firstCell, int rows, int cells, HSSFCellStyle style, HSSFPatriarch drawingPatriarch)
-        {
-            HSSFCellStyle templateStyle23 = WorkbookManager.GetNewHSSFCellStyle();
-            templateStyle23.BorderTop = 2;
-            templateStyle23.BorderRight = 2;
-            templateStyle23.BorderRight = 2;
-            templateStyle23.BorderBottom = 2;
-            templateStyle23.FillPattern = HSSFCellStyle.SOLID_FOREGROUND;
-            templateStyle23.FillForegroundColor = HSSFColor.PINK.index;
-
-            for (int r = firstRow; r < (rows + firstRow); r++)
-            {
-                for (int c = firstCell; c < (cells + firstCell); c++)
-                {
-                    sheet.GetRow(r).RowStyle = templateStyle23;
-                }
-            }
-        }
-
         private static void ApplyConditinalFormattingContentTable(HSSFSheet sheet, int firstRow, int rows, int firstCell, int lastCell, List<PropertyCell> cellPoints)
         {
             for (int r = firstRow; r < (firstRow + rows); r++)
             {
-                RowStyle style = TesteA(sheet.GetRow(r), cellPoints);
+                RowStyle style = GetRowStyle(sheet.GetRow(r), cellPoints);
 
                 if (style != null)
                 {
                     ApplyRowStyle(sheet.GetRow(r), style);
                 }
-
-                //for (int c = firstCell; c < lastCell; c++)
-                //{
-                //    .GetCell(c).CellStyle = style;
-                //}
+                else
+                {
+                    ApplyRowStyle(sheet.GetRow(r), _defaultContentRowStyle);
+                }
             }
         }
 
-        private static RowStyle TesteA(HSSFRow row, List<PropertyCell> cellPoints)
+        private static RowStyle GetRowStyle(HSSFRow row, List<PropertyCell> cellPoints)
         {
             ConditionalFormattingTemplate template = null;
             foreach (var item in cellPoints)
@@ -216,9 +188,7 @@ namespace SpreadsheetFactory
                         {
                             if (style.Priority > template.Priority)
                             {
-                                //System.Diagnostics.Debug.WriteLine("A: "+template.RowStyle.RowStyleName + ">" + template.RowStyle.RowForegroundColor);
                                 template = style;
-                                //System.Diagnostics.Debug.WriteLine("D: "+template.RowStyle.RowStyleName + ">" + template.RowStyle.RowForegroundColor);
                             }
                         }
                         else
@@ -230,7 +200,6 @@ namespace SpreadsheetFactory
             }
             if (template != null)
             {
-                //System.Diagnostics.Debug.WriteLine(template.RowStyle.RowStyleName + ">" + template.RowStyle.RowForegroundColor);
                 return template.RowStyle;
             }
             else
@@ -321,20 +290,6 @@ namespace SpreadsheetFactory
             return false;
 
         }
-
-        //private static HSSFCellStyle GetConditionalStyle(List<PropertyCell> cellPoints)
-        //{
-        //    int maxPriority = 0;
-        //    int cellToComment = 0;
-
-        //    foreach (var item in cellPoints)
-        //    {
-        //        foreach (var s in _conditionalFormatDictionary[item.PropertyName])
-        //        {
-        //            s.Priority = (s.Priority > maxPriority ? s.Priority : maxPriority);
-        //        }
-        //    }
-        //}
 
         private static void AddConditionalFormatComment(HSSFSheet sheet, HSSFCell cell, string comment)
         {
@@ -451,8 +406,8 @@ namespace SpreadsheetFactory
                     propValue = GetPropValue(item, properties[i]);
                     switch (SheetUtil.GetCellType(propValue))
                     {
-                        case HSSFCell. CELL_TYPE_NUMERIC:
-                            sheet.GetRow(row).GetCell(i).SetCellValue( double.Parse(propValue.ToString()));
+                        case HSSFCell.CELL_TYPE_NUMERIC:
+                            sheet.GetRow(row).GetCell(i).SetCellValue(double.Parse(propValue.ToString()));
                             break;
                         case HSSFCell.CELL_TYPE_STRING:
                             sheet.GetRow(row).GetCell(i).SetCellValue(propValue.ToString());
@@ -548,12 +503,28 @@ namespace SpreadsheetFactory
 
         private static void ApplyRowStyle(HSSFRow row, RowStyle rowStyle)
         {
-            foreach (KeyValuePair<int, HSSFCellStyle> style in rowStyle.CellStyles)
+            if (rowStyle != null && rowStyle.CellStyles != null)
             {
-                System.Diagnostics.Debug.WriteLine("XXXXXXXXXX >>>> "+rowStyle.RowStyleName + ">" + rowStyle.RowForegroundColor);
-                row.GetCell(style.Key + row.FirstCellNum).CellStyle = style.Value;
+                foreach (KeyValuePair<int, HSSFCellStyle> style in rowStyle.CellStyles)
+                {
+                    row.GetCell(style.Key + row.FirstCellNum).CellStyle = style.Value;
+                }
             }
         }
+
+        #endregion Private Methods
+
+        #region Constructor
+
+        static WorkbookManager()
+        {
+            if (_workbook == null)
+            {
+                _workbook = new HSSFWorkbook();
+            }
+        }
+
+        #endregion Constructor
 
         internal struct PropertyCell
         {
