@@ -1,0 +1,5 @@
+c:\users\italo.pessoa\documents\visual studio 2013\Projects\SpreadsheetFactory\SpreadsheetFactory\bin\Debug\SpreadsheetFactory.dll
+c:\users\italo.pessoa\documents\visual studio 2013\Projects\SpreadsheetFactory\SpreadsheetFactory\bin\Debug\SpreadsheetFactory.pdb
+c:\users\italo.pessoa\documents\visual studio 2013\Projects\SpreadsheetFactory\SpreadsheetFactory\obj\Debug\SpreadsheetFactory.csprojResolveAssemblyReference.cache
+c:\users\italo.pessoa\documents\visual studio 2013\Projects\SpreadsheetFactory\SpreadsheetFactory\obj\Debug\SpreadsheetFactory.dll
+c:\users\italo.pessoa\documents\visual studio 2013\Projects\SpreadsheetFactory\SpreadsheetFactory\obj\Debug\SpreadsheetFactory.pdb

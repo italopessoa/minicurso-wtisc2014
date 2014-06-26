@@ -1,0 +1,8 @@
+c:\users\italo.pessoa\documents\visual studio 2013\Projects\SpreadsheetFactory\SpreadsheetFactory.Test\bin\Debug\SpreadsheetFactory.Test.exe.config
+c:\users\italo.pessoa\documents\visual studio 2013\Projects\SpreadsheetFactory\SpreadsheetFactory.Test\bin\Debug\SpreadsheetFactory.Test.exe
+c:\users\italo.pessoa\documents\visual studio 2013\Projects\SpreadsheetFactory\SpreadsheetFactory.Test\bin\Debug\SpreadsheetFactory.Test.pdb
+c:\users\italo.pessoa\documents\visual studio 2013\Projects\SpreadsheetFactory\SpreadsheetFactory.Test\bin\Debug\SpreadsheetFactory.dll
+c:\users\italo.pessoa\documents\visual studio 2013\Projects\SpreadsheetFactory\SpreadsheetFactory.Test\bin\Debug\SpreadsheetFactory.pdb
+c:\users\italo.pessoa\documents\visual studio 2013\Projects\SpreadsheetFactory\SpreadsheetFactory.Test\obj\Debug\SpreadsheetFactory.Test.csprojResolveAssemblyReference.cache
+c:\users\italo.pessoa\documents\visual studio 2013\Projects\SpreadsheetFactory\SpreadsheetFactory.Test\obj\Debug\SpreadsheetFactory.Test.exe
+c:\users\italo.pessoa\documents\visual studio 2013\Projects\SpreadsheetFactory\SpreadsheetFactory.Test\obj\Debug\SpreadsheetFactory.Test.pdb
