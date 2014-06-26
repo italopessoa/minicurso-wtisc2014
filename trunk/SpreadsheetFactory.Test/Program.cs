@@ -236,6 +236,7 @@ namespace SpreadsheetFactory.Test
 
             #endregion
 
+            
             HSSFDataFormat dateFormat = WorkbookManager.GetNewHSSFDataFormat();
             short dateFormatIndex = dateFormat.GetFormat("DD/MM/YYYY");
 
@@ -244,6 +245,7 @@ namespace SpreadsheetFactory.Test
             list.Add(new Pessoa() { Idade = 1, Nascimento = new DateTime(2013,2,2), Nome = "Italo", Salario = 10.3 });
             list.Add(new Pessoa() { Idade = 12, Nascimento = DateTime.Now, Nome = "Italo", Salario = 20 });
             list.Add(new Pessoa() { Idade = 12, Nascimento = DateTime.Now, Nome = "Italo", Salario = 10.3 });
+            list.Add(new Pessoa() { Idade = 100, Nascimento = DateTime.Now, Nome = "Italo", Salario = 1 });
 
             string[] properties = new string[4];
             properties[0] = "Idade";
@@ -284,6 +286,7 @@ namespace SpreadsheetFactory.Test
             WorkbookManager.SetDefaultContentCellStyle(contentStyle);
 
 
+            //salario == 2
             #region linhaVermelha
 
             HSSFCellStyle celulaVermelha0 = WorkbookManager.GetNewHSSFCellStyle();
@@ -332,6 +335,7 @@ namespace SpreadsheetFactory.Test
 
             #endregion linhaVermelha
 
+            //salario > 2
             #region linha azul
 
 
@@ -382,7 +386,7 @@ namespace SpreadsheetFactory.Test
 
             #endregion linha azul
 
-
+            //idade == 1
             #region linha verde
 
 
@@ -433,6 +437,7 @@ namespace SpreadsheetFactory.Test
 
             #endregion linha verde
 
+            //nascimento == "02/02/2013";
             #region linha Amarela
 
 
@@ -482,6 +487,11 @@ namespace SpreadsheetFactory.Test
 
 
             #endregion linha amarela
+
+            RowStyle rs = new RowStyle();
+            
+            
+            WorkbookManager.SetDefaultContentRowStyle(rs);
 
             WorkbookManager.CreateSpreadsheet(spf);
             //Console.WriteLine("FIM");
