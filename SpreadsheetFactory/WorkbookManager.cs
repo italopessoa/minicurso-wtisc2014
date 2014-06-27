@@ -12,27 +12,27 @@ namespace SpreadsheetFactory
     {
         #region Private Members
 
-        private static int tableHeaderRows = 0;
+        private int tableHeaderRows = 0;
 
-        private static int _tableHeaderCells = 0;
+        private int _tableHeaderCells = 0;
 
-        private static int headerCell;
+        private int headerCell;
 
-        private static HSSFWorkbook _workbook;
+        private HSSFWorkbook _workbook;
 
-        private static HSSFCellStyle _headerCellStyle = null;
+        private HSSFCellStyle _headerCellStyle = null;
 
-        private static HSSFCellStyle _defaultContentCellStyle = null;
+        private HSSFCellStyle _defaultContentCellStyle = null;
 
-        private static RowStyle _defaultContentRowStyle = null;
+        private RowStyle _defaultContentRowStyle = null;
 
-        private static IDictionary<string, List<ConditionalFormattingTemplate>> _conditionalFormatDictionary;
+        private IDictionary<string, List<ConditionalFormattingTemplate>> _conditionalFormatDictionary;
 
         #endregion Private Members
 
         #region Public Methods
 
-        public static void AddConditionalFormatting(string property, ConditionalFormattingTemplate format)
+        public void AddConditionalFormatting(string property, ConditionalFormattingTemplate format)
         {
             if (_conditionalFormatDictionary == null)
             {
@@ -54,37 +54,37 @@ namespace SpreadsheetFactory
             }
         }
 
-        public static HSSFCellStyle GetNewHSSFCellStyle()
+        public HSSFCellStyle GetNewHSSFCellStyle()
         {
             return _workbook.CreateCellStyle();
         }
 
-        public static HSSFFont GetNewHSSFCellFont()
+        public HSSFFont GetNewHSSFCellFont()
         {
             return _workbook.CreateFont();
         }
 
-        public static HSSFDataFormat GetNewHSSFDataFormat()
+        public HSSFDataFormat GetNewHSSFDataFormat()
         {
             return _workbook.CreateDataFormat();
         }
 
-        public static void SetHeaderCellStyle(HSSFCellStyle cellStyle)
+        public void SetHeaderCellStyle(HSSFCellStyle cellStyle)
         {
             _headerCellStyle = cellStyle;
         }
 
-        public static void SetDefaultContentCellStyle(HSSFCellStyle cellStyle)
+        public void SetDefaultContentCellStyle(HSSFCellStyle cellStyle)
         {
             _defaultContentCellStyle = cellStyle;
         }
 
-        public static void SetDefaultContentRowStyle(RowStyle rowStyle)
+        public void SetDefaultContentRowStyle(RowStyle rowStyle)
         {
             _defaultContentRowStyle = rowStyle;
         }
 
-        public static void CreateSpreadsheet(SpreadsheetFactory spreadsheetFactory)
+        public void CreateSpreadsheet(SpreadsheetFactory spreadsheetFactory)
         {
             if (spreadsheetFactory != null)
             {
@@ -147,7 +147,7 @@ namespace SpreadsheetFactory
 
         #region Private Methods
 
-        private static void ApplyHeaderCellStyle(HSSFSheet sheet, int firstRow, int firstCell, int rows, int cells, HSSFCellStyle style)
+        private void ApplyHeaderCellStyle(HSSFSheet sheet, int firstRow, int firstCell, int rows, int cells, HSSFCellStyle style)
         {
             for (int r = firstRow; r < (rows + firstRow); r++)
             {
@@ -158,7 +158,7 @@ namespace SpreadsheetFactory
             }
         }
 
-        private static void ApplyConditinalFormattingContentTable(HSSFSheet sheet, int firstRow, int rows, int firstCell, int lastCell, List<PropertyCell> cellPoints)
+        private void ApplyConditinalFormattingContentTable(HSSFSheet sheet, int firstRow, int rows, int firstCell, int lastCell, List<PropertyCell> cellPoints)
         {
             for (int r = firstRow; r < (firstRow + rows); r++)
             {
@@ -175,7 +175,7 @@ namespace SpreadsheetFactory
             }
         }
 
-        private static RowStyle GetRowStyle(HSSFRow row, List<PropertyCell> cellPoints)
+        private RowStyle GetRowStyle(HSSFRow row, List<PropertyCell> cellPoints)
         {
             ConditionalFormattingTemplate template = null;
             foreach (var item in cellPoints)
@@ -208,7 +208,7 @@ namespace SpreadsheetFactory
             }
         }
 
-        private static bool IsMatchStyle(ConditionalFormattingTemplate cft, HSSFCell cell)
+        private bool IsMatchStyle(ConditionalFormattingTemplate cft, HSSFCell cell)
         {
             int CELL_TYPE_INDEX = SheetUtil.GetCellType(cft.Value);
 
@@ -291,7 +291,7 @@ namespace SpreadsheetFactory
 
         }
 
-        private static void AddConditionalFormatComment(HSSFSheet sheet, HSSFCell cell, string comment)
+        private void AddConditionalFormatComment(HSSFSheet sheet, HSSFCell cell, string comment)
         {
             /*HSSFPatriarch patr = sheet.DrawingPatriarch CreateDrawingPatriarch();
             //anchor defines size and position of the comment in worksheet
@@ -303,7 +303,7 @@ namespace SpreadsheetFactory
             sheet.GetRow(r).GetCell(c).CellComment = comment1;*/
         }
 
-        private static void PrepareTableHeader(HSSFSheet sheet, IList<TableHeader> tableHeaders, int cell)
+        private void PrepareTableHeader(HSSFSheet sheet, IList<TableHeader> tableHeaders, int cell)
         {
             tableHeaderRows = SheetUtil.GetTotalHeaderRows(tableHeaders);
             CreateHeaderRows(sheet, tableHeaders);
@@ -311,7 +311,7 @@ namespace SpreadsheetFactory
             CreateHeaderCells(sheet, cell);
         }
 
-        private static void ConfigTableHeader(HSSFSheet sheet, IList<TableHeader> tableHeaders, ref int cell, int row)
+        private void ConfigTableHeader(HSSFSheet sheet, IList<TableHeader> tableHeaders, ref int cell, int row)
         {
             headerCell = cell;
             int cellRow = row;
@@ -361,7 +361,7 @@ namespace SpreadsheetFactory
             }
         }
 
-        private static void CreateHeaderRows(HSSFSheet sheet, IList<TableHeader> tableHeaders)
+        private void CreateHeaderRows(HSSFSheet sheet, IList<TableHeader> tableHeaders)
         {
             for (int i = 0; i < tableHeaderRows; i++)
             {
@@ -369,7 +369,7 @@ namespace SpreadsheetFactory
             }
         }
 
-        private static void CreateHeaderCells(HSSFSheet sheet, int firstCell)
+        private void CreateHeaderCells(HSSFSheet sheet, int firstCell)
         {
             for (int i = 1; i < tableHeaderRows + 1; i++)
             {
@@ -382,7 +382,7 @@ namespace SpreadsheetFactory
             }
         }
 
-        private static void CreateContentTableCells(HSSFSheet sheet, int rows, int cells, int firstCell, int firstRow)
+        private void CreateContentTableCells(HSSFSheet sheet, int rows, int cells, int firstCell, int firstRow)
         {
             for (int i = sheet.LastRowNum; i < firstRow + rows; i++)
             {
@@ -394,7 +394,7 @@ namespace SpreadsheetFactory
             }
         }
 
-        private static void SetContentTableCellsValue(HSSFSheet sheet, int firstRow, int firstCell, string[] properties, List<object> values)
+        private void SetContentTableCellsValue(HSSFSheet sheet, int firstRow, int firstCell, string[] properties, List<object> values)
         {
             int row = firstRow;
             object propValue;
@@ -421,12 +421,12 @@ namespace SpreadsheetFactory
             }
         }
 
-        private static object GetPropValue(object src, string propName)
+        private object GetPropValue(object src, string propName)
         {
             return src.GetType().GetProperty(propName).GetValue(src, null);
         }
 
-        private static void GetTableHeaderCells(IList<TableHeader> tableHeaders)
+        private void GetTableHeaderCells(IList<TableHeader> tableHeaders)
         {
             foreach (var item in tableHeaders)
             {
@@ -442,7 +442,7 @@ namespace SpreadsheetFactory
             }
         }
 
-        private static HSSFSheet CreateTitle(string title, string sheetName)
+        private HSSFSheet CreateTitle(string title, string sheetName)
         {
             HSSFSheet newSheet;
 
@@ -464,7 +464,7 @@ namespace SpreadsheetFactory
             return newSheet;
         }
 
-        private static HSSFSheet ConfigHeader(HSSFSheet sheet, IDictionary<string, object> filters)
+        private HSSFSheet ConfigHeader(HSSFSheet sheet, IDictionary<string, object> filters)
         {
             foreach (KeyValuePair<string, object> item in filters)
             {
@@ -489,7 +489,7 @@ namespace SpreadsheetFactory
             return sheet;
         }
 
-        public static void SaveSpreadsheet(string filePath, string fileName)
+        public void SaveSpreadsheet(string filePath, string fileName)
         {
             MemoryStream ms = new MemoryStream();
             _workbook.Write(ms);
@@ -501,7 +501,7 @@ namespace SpreadsheetFactory
             _workbook = null;
         }
 
-        private static void ApplyRowStyle(HSSFRow row, RowStyle rowStyle)
+        private void ApplyRowStyle(HSSFRow row, RowStyle rowStyle)
         {
             if (rowStyle != null && rowStyle.CellStyles != null)
             {
@@ -516,7 +516,15 @@ namespace SpreadsheetFactory
 
         #region Constructor
 
-        static WorkbookManager()
+        //static WorkbookManager()
+        //{
+        //    if (_workbook == null)
+        //    {
+        //        _workbook = new HSSFWorkbook();
+        //    }
+        //}
+
+        public WorkbookManager()
         {
             if (_workbook == null)
             {

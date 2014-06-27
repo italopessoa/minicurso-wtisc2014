@@ -235,7 +235,7 @@ namespace SpreadsheetFactory.Test
             //spf.TableHeaders.Add(tc);
 
             #endregion
-
+            WorkbookManager WorkbookManager = new global::SpreadsheetFactory.WorkbookManager();
             
             HSSFDataFormat dateFormat = WorkbookManager.GetNewHSSFDataFormat();
             short dateFormatIndex = dateFormat.GetFormat("DD/MM/YYYY");
