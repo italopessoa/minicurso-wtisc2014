@@ -4,6 +4,7 @@ using System.Text;
 
 namespace SpreadsheetFactory
 {
+    //TODO: definir um modelo para representar uma linha que realize o merge de acordo com a quantidade de celulas, servindo como titulo
     public class SpreadsheetFactory
     {
         private Header _header;
@@ -37,5 +38,29 @@ namespace SpreadsheetFactory
             get { return _properties; }
             set { _properties = value; }
         }
+
+        public int TableHeaderRows 
+        {
+            get { return SheetUtil.GetTotalHeaderRows(_tableHeaders); }
+        }
+
+        public int TableHeaderCells
+        {
+            get { return SheetUtil.GetTableHeaderCells(_tableHeaders); }
+        }
+
+        public int FirstHeaderCell { get; set; }
+
+        private IList<SpreadsheetFactory> _spreadsheetFactoryList;
+
+        public IList<SpreadsheetFactory> SpreadsheetFactoryList
+        {
+            get { return _spreadsheetFactoryList; }
+            set { _spreadsheetFactoryList = value; }
+        }
+
+        public string Name { get; set; }
+
+        public string MergedTitle { get; set; }
     }
 }
