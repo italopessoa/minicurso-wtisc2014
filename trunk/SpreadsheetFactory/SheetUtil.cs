@@ -10,7 +10,7 @@ namespace SpreadsheetFactory
         public static int DEFAULT_FIRST_CELL = 0;
         private static int tableHeaderRows = 0;
         private static int tableHeaderRowsAux = 0;
-
+        private static int _tableHeaderCells = 0;
         //temporario, a biblioteca padrao nao possui um valor para Datetime
         public const int CELL_TYPE_DATETIME = 99;
 
@@ -84,5 +84,41 @@ namespace SpreadsheetFactory
             }
             return tableHeaderRows;
         }
+
+        public static int GetTableHeaderCells(IList<TableHeader> tableHeaders)
+        {
+            _tableHeaderCells = 0;
+            CountTableHeaderCells(tableHeaders);
+            return _tableHeaderCells;
+        }
+
+        private static void CountTableHeaderCells(IList<TableHeader> tableHeaders)
+        {
+            foreach (var item in tableHeaders)
+            {
+                if (item.Cells == null || item.Cells.Count == 0)
+                {
+                    _tableHeaderCells++;
+                }
+                else
+                {
+                    //tableHeaderCells++;
+                    CountTableHeaderCells(item.Cells);
+                }
+            }
+        }
+
+        //TODO: melhorar essa verificação, uma célula pode não ter um tip definido. se for bool sempre terá um valor. Linha vazia não contém células
+        public static bool IsEmpty(this NPOI.HSSF.UserModel.HSSFRow row)
+        {
+            return row.FirstCellNum < 0;
+        }
     }
+}
+
+// you need this once (only), and it must be in this namespace
+namespace System.Runtime.CompilerServices
+{
+    [AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Class | AttributeTargets.Method)]
+    public sealed class ExtensionAttribute : Attribute { }
 }
