@@ -25,7 +25,35 @@ namespace SpreadsheetFactory.Test
             spf1.MergedTitle = "titulo";
             teste.SpreadsheetFactoryList.Add(spf1);
             spf2.Name = "teste 1";
+            spf2.MergedTitle = "titulo 1";
             teste.SpreadsheetFactoryList.Add(spf2);
+
+
+            //SpreadsheetFactory teste = new SpreadsheetFactory();
+            //teste.SpreadsheetFactoryList = new List<SpreadsheetFactory>();
+            //spf1.Name = "teste 1";
+            //spf1.MergedTitle = "titulo";
+            //spf1.ChildSheet = new ChildSheet("Lista");
+            //spf1.ChildSheet.Name = "teste 1";
+            //string[] properties = new string[4];
+            //properties[0] = "Idade";
+            //properties[1] = "Nascimento";
+            //properties[2] = "Nome";
+            //properties[3] = "Salario";
+            //spf1.ChildSheet.Properties = properties;
+            ////spf1.ChildSheet.SpreadsheetFactoryList = new List<SpreadsheetFactory>();
+            ////spf2.MergedTitle = "AGRUPADO";
+            ////spf2.Name = "teste 1";
+            ////spf1.ChildSheet.SpreadsheetFactoryList.Add(spf2);
+
+
+          
+
+
+            //spf1.ChildSheet.Datasource = list;
+            
+                
+           // teste.SpreadsheetFactoryList.Add(spf1);
 
             WorkbookManager.MountSpreadsheet(teste);
         
@@ -262,10 +290,19 @@ namespace SpreadsheetFactory.Test
 
             List<object> list = new List<object>();
             list.Add(new Pessoa() { Idade = 12, Nascimento = DateTime.Now, Nome = "Italo", Salario = 2 });
-            list.Add(new Pessoa() { Idade = 1, Nascimento = new DateTime(2013, 2, 2), Nome = "Italo", Salario = 10.3 });
-            list.Add(new Pessoa() { Idade = 12, Nascimento = DateTime.Now, Nome = "Italo", Salario = 20 });
-            list.Add(new Pessoa() { Idade = 12, Nascimento = DateTime.Now, Nome = "Italo", Salario = 10.3 });
-            list.Add(new Pessoa() { Idade = 100, Nascimento = DateTime.Now, Nome = "Italo", Salario = 1 });
+            //list.Add(new Pessoa() { Idade = 1, Nascimento = new DateTime(2013, 2, 2), Nome = "Italo", Salario = 10.3 });
+            //list.Add(new Pessoa() { Idade = 12, Nascimento = DateTime.Now, Nome = "Italo", Salario = 20 });
+            //list.Add(new Pessoa() { Idade = 12, Nascimento = DateTime.Now, Nome = "Italo", Salario = 10.3 });
+            //list.Add(new Pessoa() { Idade = 100, Nascimento = DateTime.Now, Nome = "Italo", Salario = 1 });
+
+            List<object> list2 = new List<object>();
+            list2.Add(new Pessoa() { Idade = 12, Nascimento = DateTime.Now, Nome = "JOAO", Salario = 2 });
+            list2.Add(new Pessoa() { Idade = 1, Nascimento = new DateTime(2013, 2, 2), Nome = "JOAO", Salario = 10.3 });
+            list2.Add(new Pessoa() { Idade = 12, Nascimento = DateTime.Now, Nome = "JOAO", Salario = 20 });
+            list2.Add(new Pessoa() { Idade = 12, Nascimento = DateTime.Now, Nome = "JOAO", Salario = 10.3 });
+            list2.Add(new Pessoa() { Idade = 100, Nascimento = DateTime.Now, Nome = "JOAO", Salario = 1 });
+            (list[0] as Pessoa).Lista = list2;
+
 
             string[] properties = new string[4];
             properties[0] = "Idade";
@@ -293,7 +330,7 @@ namespace SpreadsheetFactory.Test
             font.Boldweight = HSSFFont.BOLDWEIGHT_BOLD;
             headerStyle.SetFont(font);
 
-            WorkbookManager.SetHeaderCellStyle(headerStyle);
+           // WorkbookManager.SetHeaderCellStyle(headerStyle);
 
             HSSFCellStyle contentStyle = WorkbookManager.GetNewHSSFCellStyle();
             contentStyle.BorderTop = 1;
@@ -302,9 +339,6 @@ namespace SpreadsheetFactory.Test
             contentStyle.BorderBottom = 1;
             contentStyle.FillPattern = HSSFCellStyle.SOLID_FOREGROUND;
             contentStyle.FillForegroundColor = HSSFColor.YELLOW.index;
-
-            WorkbookManager.SetDefaultContentCellStyle(contentStyle);
-
 
             //salario == 2
             #region linhaVermelha
@@ -351,7 +385,7 @@ namespace SpreadsheetFactory.Test
             template.PropertyName = "Salario";
             template.Value = 2;
             template.RowStyle = linhaVermelha;
-            WorkbookManager.AddConditionalFormatting("Salario", template);
+            spf.AddConditionalFormatting("Salario", template);
 
             #endregion linhaVermelha
 
@@ -401,7 +435,7 @@ namespace SpreadsheetFactory.Test
             templateAzul.PropertyName = "Salario";
             templateAzul.Value = 2;
             templateAzul.RowStyle = linhaAzul;
-            WorkbookManager.AddConditionalFormatting("Salario", templateAzul);
+            spf.AddConditionalFormatting("Salario", templateAzul);
 
 
             #endregion linha azul
@@ -452,7 +486,7 @@ namespace SpreadsheetFactory.Test
             templateVerde.PropertyName = "Idade";
             templateVerde.Value = 1;
             templateVerde.RowStyle = linhaVerde;
-            WorkbookManager.AddConditionalFormatting("Idade", templateVerde);
+            spf.AddConditionalFormatting("Idade", templateVerde);
 
 
             #endregion linha verde
@@ -503,16 +537,16 @@ namespace SpreadsheetFactory.Test
             templateAmarela.PropertyName = "Nascimento";
             templateAmarela.Value = new DateTime(2013, 2, 2);//"02/02/2013";
             templateAmarela.RowStyle = linhaAmarela;
-            WorkbookManager.AddConditionalFormatting("Nascimento", templateAmarela);
+            spf.AddConditionalFormatting("Nascimento", templateAmarela);
 
 
             #endregion linha amarela
 
             RowStyle rs = new RowStyle();
 
-
-            WorkbookManager.SetDefaultContentRowStyle(rs);
             spf.FirstHeaderCell = 0;
+            spf.HeaderCellStyle = headerStyle;
+            spf.RowStyle = rs;
 
             return spf;
         }
@@ -521,14 +555,13 @@ namespace SpreadsheetFactory.Test
         {
             SpreadsheetFactory spf = new SpreadsheetFactory();
 
-
             HSSFDataFormat dateFormat = WorkbookManager.GetNewHSSFDataFormat();
             short dateFormatIndex = dateFormat.GetFormat("DD/MM/YYYY");
 
             List<object> list = new List<object>();
-            list.Add(new Pessoa() { Idade = 12, Nascimento = DateTime.Now, Nome = "Italo", Salario = 2 });
+            list.Add(new Pessoa() { Idade = 12, Nascimento = DateTime.Now, Nome = "joa", Salario = 2 });
             list.Add(new Pessoa() { Idade = 1, Nascimento = new DateTime(2013, 2, 2), Nome = "Italo", Salario = 10.3 });
-            list.Add(new Pessoa() { Idade = 12, Nascimento = DateTime.Now, Nome = "Italo", Salario = 20 });
+            list.Add(new Pessoa() { Idade = 12, Nascimento = DateTime.Now, Nome = "joa", Salario = 20 });
             list.Add(new Pessoa() { Idade = 12, Nascimento = DateTime.Now, Nome = "Italo", Salario = 10.3 });
             list.Add(new Pessoa() { Idade = 100, Nascimento = DateTime.Now, Nome = "Italo", Salario = 1 });
 
@@ -549,8 +582,6 @@ namespace SpreadsheetFactory.Test
             contentStyle.FillPattern = HSSFCellStyle.SOLID_FOREGROUND;
             contentStyle.FillForegroundColor = HSSFColor.YELLOW.index;
 
-            WorkbookManager.SetDefaultContentCellStyle(contentStyle);
-
 
             //salario == 2
             #region linhaVermelha
@@ -597,7 +628,7 @@ namespace SpreadsheetFactory.Test
             template.PropertyName = "Salario";
             template.Value = 2;
             template.RowStyle = linhaVermelha;
-            WorkbookManager.AddConditionalFormatting("Salario", template);
+            spf.AddConditionalFormatting("Salario", template);
 
             #endregion linhaVermelha
 
@@ -647,7 +678,7 @@ namespace SpreadsheetFactory.Test
             templateAzul.PropertyName = "Salario";
             templateAzul.Value = 2;
             templateAzul.RowStyle = linhaAzul;
-            WorkbookManager.AddConditionalFormatting("Salario", templateAzul);
+            spf.AddConditionalFormatting("Salario", templateAzul);
 
 
             #endregion linha azul
@@ -698,7 +729,7 @@ namespace SpreadsheetFactory.Test
             templateVerde.PropertyName = "Idade";
             templateVerde.Value = 1;
             templateVerde.RowStyle = linhaVerde;
-            WorkbookManager.AddConditionalFormatting("Idade", templateVerde);
+            spf.AddConditionalFormatting("Idade", templateVerde);
 
 
             #endregion linha verde
@@ -749,7 +780,7 @@ namespace SpreadsheetFactory.Test
             templateAmarela.PropertyName = "Nascimento";
             templateAmarela.Value = new DateTime(2013, 2, 2);//"02/02/2013";
             templateAmarela.RowStyle = linhaAmarela;
-            WorkbookManager.AddConditionalFormatting("Nascimento", templateAmarela);
+            spf.AddConditionalFormatting("Nascimento", templateAmarela);
 
 
             #endregion linha amarela
@@ -757,13 +788,12 @@ namespace SpreadsheetFactory.Test
             RowStyle rs = new RowStyle();
 
 
-            WorkbookManager.SetDefaultContentRowStyle(rs);
             spf.FirstHeaderCell = 0;
-
+            spf.RowStyle = rs;
             return spf;
         }
 
-        static void Mai2n(string[] args)
+        static void Ma3in(string[] args)
         {
             //HSSFWorkbook wb = new HSSFWorkbook(); //or new HSSFWorkbook();
 
@@ -805,6 +835,64 @@ namespace SpreadsheetFactory.Test
 
             ConditionalFormattingTemplate de = new ConditionalFormattingTemplate();
 
+        }
+
+
+        static void Maiwn(string[] args)
+        {
+            A a = new A();
+            a.Idade = 1;
+            a.MyProperty = new B();
+            a.MyProperty.Idade = new List<object>();
+
+
+            a.MyProperty.MyPropertyA = a;
+
+            Console.WriteLine(GetPropValue(a, "MyProperty.MyPropertyA.Idade"));
+            Console.Read();
+        }
+
+        public static object GetPropValue(object src, string propName)
+        {
+            //TODO: é realmente necessário utilizar uma lista generica de object?
+            Type list = typeof(System.Collections.Generic.IList<object>);
+            string listNamespace = list.Namespace;
+
+            object aux = src;
+            string[] nivels = propName.Split('.');
+
+            object property = null;
+
+            foreach (var nivel in nivels)
+            {
+                property = aux.GetType().GetProperty(nivel).GetValue(aux, null);
+                if (property != null)
+                {
+                    aux = property;
+                }
+            }
+
+            if (property!= null && !property.GetType().Namespace.Equals(listNamespace))
+            {
+                //TODO: melhorar a mensagem informando a propriedade
+                throw new ArgumentException("o objeto indicado  não é uma lista");
+            }
+
+            return property;
+        }
+
+        internal class A
+        {
+            public B MyProperty { get; set; }
+            public int Idade { get; set; }
+        }
+
+        internal class B
+        {
+            public IList<object> MyProperty { get; set; }
+            public IList<object> Idade { get; set; }
+            public StringBuilder Data { get; set; }
+            public A MyPropertyA { get; set; }
         }
     }
 
