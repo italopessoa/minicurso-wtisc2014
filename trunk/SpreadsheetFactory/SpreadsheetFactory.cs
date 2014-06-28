@@ -11,7 +11,7 @@ namespace SpreadsheetFactory
 
         private IList<TableHeader> _tableHeaders;
 
-        private List<object> _datasource;
+        private IList<object> _datasource;
         
         private string[] _properties;
 
@@ -27,7 +27,7 @@ namespace SpreadsheetFactory
             set { _tableHeaders = value; }
         }
 
-        public List<object> Datasource
+        public IList<object> Datasource
         {
             get { return _datasource; }
             set { _datasource = value; }
@@ -62,5 +62,57 @@ namespace SpreadsheetFactory
         public string Name { get; set; }
 
         public string MergedTitle { get; set; }
+
+        public NPOI.HSSF.UserModel.HSSFCellStyle HeaderCellStyle { get; set; }
+
+        public RowStyle RowStyle { get; set; }
+
+        private IDictionary<string, List<ConditionalFormattingTemplate>> _conditionalFormatDictionary;
+
+        public IDictionary<string, List<ConditionalFormattingTemplate>> ConditionalFormatList
+        {
+            get { return _conditionalFormatDictionary; }
+        }
+
+        public void AddConditionalFormatting(string property, ConditionalFormattingTemplate format)
+        {
+            if (_conditionalFormatDictionary == null)
+            {
+                _conditionalFormatDictionary = new Dictionary<string, List<ConditionalFormattingTemplate>>();
+            }
+
+            if (_conditionalFormatDictionary.Keys.Contains(property))
+            {
+                _conditionalFormatDictionary[property].Add(format);
+                _conditionalFormatDictionary[property].Sort(delegate(ConditionalFormattingTemplate a, ConditionalFormattingTemplate b)
+                {
+                    return a.Priority.CompareTo(b.Priority);
+                });
+            }
+            else
+            {
+                _conditionalFormatDictionary[property] = new List<ConditionalFormattingTemplate>();
+                _conditionalFormatDictionary[property].Add(format);
+            }
+        }
+
+        //private SpreadsheetFactory _childSheet;
+        private ChildSheet _childSheet;
+
+        public ChildSheet ChildSheet
+        {
+            get { return _childSheet; }
+            set { _childSheet = value; }
+        }
+
+        private int _firstCell = 0;
+
+        public int FirstCell
+        {
+            get { return _firstCell; }
+            set { _firstCell =  value; }
+        }
+        
+        
     }
 }

@@ -16,39 +16,9 @@ namespace SpreadsheetFactory
 
         private HSSFWorkbook _workbook;
 
-        private HSSFCellStyle _headerCellStyle = null;
-
-        private HSSFCellStyle _defaultContentCellStyle = null;
-
-        private RowStyle _defaultContentRowStyle = null;
-
-        private IDictionary<string, List<ConditionalFormattingTemplate>> _conditionalFormatDictionary;
-
         #endregion Private Members
 
         #region Public Methods
-
-        public void AddConditionalFormatting(string property, ConditionalFormattingTemplate format)
-        {
-            if (_conditionalFormatDictionary == null)
-            {
-                _conditionalFormatDictionary = new Dictionary<string, List<ConditionalFormattingTemplate>>();
-            }
-
-            if (_conditionalFormatDictionary.Keys.Contains(property))
-            {
-                _conditionalFormatDictionary[property].Add(format);
-                _conditionalFormatDictionary[property].Sort(delegate(ConditionalFormattingTemplate a, ConditionalFormattingTemplate b)
-                {
-                    return a.Priority.CompareTo(b.Priority);
-                });
-            }
-            else
-            {
-                _conditionalFormatDictionary[property] = new List<ConditionalFormattingTemplate>();
-                _conditionalFormatDictionary[property].Add(format);
-            }
-        }
 
         public HSSFCellStyle GetNewHSSFCellStyle()
         {
@@ -65,26 +35,14 @@ namespace SpreadsheetFactory
             return _workbook.CreateDataFormat();
         }
 
-        public void SetHeaderCellStyle(HSSFCellStyle cellStyle)
-        {
-            _headerCellStyle = cellStyle;
-        }
-
-        public void SetDefaultContentCellStyle(HSSFCellStyle cellStyle)
-        {
-            _defaultContentCellStyle = cellStyle;
-        }
-
-        public void SetDefaultContentRowStyle(RowStyle rowStyle)
-        {
-            _defaultContentRowStyle = rowStyle;
-        }
-
         public void MountSpreadsheet(SpreadsheetFactory spreadsheetFactory)
         {
-            foreach (var item in spreadsheetFactory.SpreadsheetFactoryList)
+            if (spreadsheetFactory.SpreadsheetFactoryList != null)
             {
-                CreateSpreadsheet(item);
+                foreach (var item in spreadsheetFactory.SpreadsheetFactoryList)
+                {
+                    CreateSpreadsheet(item);
+                }
             }
         }
 
@@ -92,6 +50,7 @@ namespace SpreadsheetFactory
         {
             if (spreadsheetFactory != null)
             {
+                //TODO: verificar se é possivel agrupar todas as verifições de linha vazia
                 HSSFSheet sheet = null;
                 HSSFPatriarch drawingPatriarch = null;
                 if (spreadsheetFactory.Header != null)
@@ -108,13 +67,13 @@ namespace SpreadsheetFactory
                     sheet.CreateRow(sheet.LastRowNum + 1);
 
                     PrepareTableHeader(sheet, spreadsheetFactory, spreadsheetFactory.FirstHeaderCell);
-                    
+
                     int firstRow = (sheet.LastRowNum - spreadsheetFactory.TableHeaderRows);
                     ConfigTableHeader(sheet, spreadsheetFactory.TableHeaders, spreadsheetFactory.FirstHeaderCell, (sheet.LastRowNum - spreadsheetFactory.TableHeaderRows));
 
-                    if (_headerCellStyle != null)
+                    if (spreadsheetFactory.HeaderCellStyle != null)
                     {
-                        ApplyHeaderCellStyle(sheet, firstRow, spreadsheetFactory.FirstHeaderCell, spreadsheetFactory.TableHeaderRows, spreadsheetFactory.TableHeaderCells, _headerCellStyle);
+                        ApplyHeaderCellStyle(sheet, firstRow, spreadsheetFactory.FirstHeaderCell, spreadsheetFactory.TableHeaderRows, spreadsheetFactory.TableHeaderCells, spreadsheetFactory.HeaderCellStyle);
                     }
 
                 }
@@ -135,39 +94,58 @@ namespace SpreadsheetFactory
                         firstRow = sheet.LastRowNum + 2;
                     }
 
+                    //
                     if (!String.IsNullOrEmpty(spreadsheetFactory.MergedTitle))
                     {
-                        CreateContentTableCells(sheet, spreadsheetFactory.Datasource.Count+1, spreadsheetFactory.Properties.Length, 0, firstRow, spreadsheetFactory.MergedTitle);
+                        //spreadsheetFactory.ChildSheet
+                        CreateContentTableCells(sheet, spreadsheetFactory.Datasource.Count, spreadsheetFactory.Properties.Length, spreadsheetFactory.FirstCell, firstRow, spreadsheetFactory.MergedTitle);
+                        //CreateContentTableCells(sheet, spreadsheetFactory, firstRow);
                         firstRow++;
                     }
                     else
                     {
-                        CreateContentTableCells(sheet, spreadsheetFactory.Datasource.Count, spreadsheetFactory.Properties.Length, 0, firstRow, string.Empty);
+                        CreateContentTableCells(sheet, spreadsheetFactory.Datasource.Count, spreadsheetFactory.Properties.Length, spreadsheetFactory.FirstCell, firstRow, string.Empty);
+                        //CreateContentTableCells(sheet, spreadsheetFactory, firstRow);
                     }
+
+                    
 
                     if (sheet.GetRow(sheet.LastRowNum).IsEmpty())
                     {
                         //TODO: corrigir
-                        SetContentTableCellsValue(sheet, firstRow, 0, spreadsheetFactory.Properties, spreadsheetFactory.Datasource);
+                        SetContentTableCellsValue(sheet, firstRow - 1, 0, spreadsheetFactory.Properties, spreadsheetFactory.Datasource,spreadsheetFactory.ChildSheet);
                     }
                     else
                     {
-                        SetContentTableCellsValue(sheet, firstRow-1, 0, spreadsheetFactory.Properties, spreadsheetFactory.Datasource);
+                        SetContentTableCellsValue(sheet, firstRow, 0, spreadsheetFactory.Properties, spreadsheetFactory.Datasource,spreadsheetFactory.ChildSheet);
                     }
-
-                    if (_conditionalFormatDictionary != null)
+                    
+                    
+                    if (spreadsheetFactory.ConditionalFormatList != null)
                     {
                         List<PropertyCell> teste = new List<PropertyCell>();
                         for (int i = 0; i < spreadsheetFactory.Properties.Length; i++)
                         {
-                            if (_conditionalFormatDictionary.Keys.Contains(spreadsheetFactory.Properties[i]))
+                            if (spreadsheetFactory.ConditionalFormatList.Keys.Contains(spreadsheetFactory.Properties[i]))
                             {
                                 teste.Add(new PropertyCell() { CellIndex = i, PropertyName = spreadsheetFactory.Properties[i] });
                             }
                         }
 
-                        ApplyConditinalFormattingContentTable(sheet, firstRow, spreadsheetFactory.Datasource.Count, 0, spreadsheetFactory.Properties.Length + 0, teste);
+                        ApplyConditinalFormattingContentTable(sheet, firstRow, spreadsheetFactory.Datasource.Count, 0, spreadsheetFactory.Properties.Length + 0, teste, spreadsheetFactory.RowStyle, spreadsheetFactory.ConditionalFormatList);
                     }
+                    //if (!String.IsNullOrEmpty(spreadsheetFactory.MergedTitle))
+                    //{
+                    //    sheet.CreateRow(sheet.LastRowNum);
+                    //    sheet.GroupRow(firstRow, sheet.LastRowNum);
+                    //    sheet.SetRowGroupCollapsed(firstRow, true);
+                    //}
+                    //else
+                    //{
+                        sheet.CreateRow(sheet.LastRowNum+1);
+                        sheet.GroupRow(firstRow, sheet.LastRowNum-1);
+                        //sheet.SetRowGroupCollapsed(firstRow, true);
+                    //}
                 }
             }
         }
@@ -187,11 +165,11 @@ namespace SpreadsheetFactory
             }
         }
 
-        private void ApplyConditinalFormattingContentTable(HSSFSheet sheet, int firstRow, int rows, int firstCell, int lastCell, List<PropertyCell> cellPoints)
+        private void ApplyConditinalFormattingContentTable(HSSFSheet sheet, int firstRow, int rows, int firstCell, int lastCell, List<PropertyCell> cellPoints, RowStyle defaultContentRowStyle, IDictionary<string, List<ConditionalFormattingTemplate>> conditionalFormatList)
         {
             for (int r = firstRow; r < (firstRow + rows); r++)
             {
-                RowStyle style = GetRowStyle(sheet.GetRow(r), cellPoints);
+                RowStyle style = GetRowStyle(sheet.GetRow(r), cellPoints, conditionalFormatList);
 
                 if (style != null)
                 {
@@ -199,17 +177,18 @@ namespace SpreadsheetFactory
                 }
                 else
                 {
-                    ApplyRowStyle(sheet.GetRow(r), _defaultContentRowStyle);
+                    ApplyRowStyle(sheet.GetRow(r), defaultContentRowStyle);
                 }
             }
         }
 
-        private RowStyle GetRowStyle(HSSFRow row, List<PropertyCell> cellPoints)
+        private RowStyle GetRowStyle(HSSFRow row, List<PropertyCell> cellPoints, IDictionary<string, List<ConditionalFormattingTemplate>> conditionalFormatList)
         {
             ConditionalFormattingTemplate template = null;
             foreach (var item in cellPoints)
             {
-                foreach (var style in _conditionalFormatDictionary[item.PropertyName])
+                //TODO: testar quando nao tiver propriedade ou for nulo
+                foreach (var style in conditionalFormatList[item.PropertyName])
                 {
                     if (IsMatchStyle(style, row.GetCell(item.CellIndex)))
                     {
@@ -334,7 +313,7 @@ namespace SpreadsheetFactory
 
         private void PrepareTableHeader(HSSFSheet sheet, SpreadsheetFactory spreadSheet, int cell)
         {
-            CreateHeaderRows(sheet, spreadSheet.TableHeaders,spreadSheet.TableHeaderRows);
+            CreateHeaderRows(sheet, spreadSheet.TableHeaders, spreadSheet.TableHeaderRows);
             CreateHeaderCells(sheet, cell, spreadSheet.TableHeaderRows, spreadSheet.TableHeaderCells);
         }
 
@@ -396,7 +375,7 @@ namespace SpreadsheetFactory
             }
         }
 
-        private void CreateHeaderCells(HSSFSheet sheet, int firstCell, int tableHeaderRows,int tableHeaderCells)
+        private void CreateHeaderCells(HSSFSheet sheet, int firstCell, int tableHeaderRows, int tableHeaderCells)
         {
             for (int i = 1; i < tableHeaderRows + 1; i++)
             {
@@ -419,7 +398,7 @@ namespace SpreadsheetFactory
                     sheet.GetRow(firstRow).CreateCell(j);
                 }
                 sheet.GetRow(firstRow).GetCell(firstCell).SetCellValue(mergedTitle);
-                sheet.AddMergedRegion(new CellRangeAddress(firstRow, firstRow, sheet.GetRow(firstRow).FirstCellNum, sheet.GetRow(firstRow).LastCellNum-1));
+                sheet.AddMergedRegion(new CellRangeAddress(firstRow, firstRow, sheet.GetRow(firstRow).FirstCellNum, sheet.GetRow(firstRow).LastCellNum - 1));
                 firstRow++;
             }
 
@@ -428,41 +407,144 @@ namespace SpreadsheetFactory
                 sheet.CreateRow(i);
                 for (int j = firstCell; j < firstCell + cells; j++)
                 {
-                    sheet.GetRow(i).CreateCell(j);//.SetCellValue("A");
+                    sheet.GetRow(i).CreateCell(j).SetCellValue("A");
                 }
             }
         }
 
-        private void SetContentTableCellsValue(HSSFSheet sheet, int firstRow, int firstCell, string[] properties, List<object> values)
+        private void CreateContentTableCells(HSSFSheet sheet, SpreadsheetFactory spreadsheet, int firstRow)
+        {
+            if (!String.IsNullOrEmpty(spreadsheet.MergedTitle))
+            {
+                sheet.CreateRow(firstRow);
+                for (int j = spreadsheet.FirstCell; j < spreadsheet.FirstCell + spreadsheet.Properties.Length; j++)
+                {
+                    sheet.GetRow(firstRow).CreateCell(j);
+                }
+                sheet.GetRow(firstRow).GetCell(spreadsheet.FirstCell).SetCellValue(spreadsheet.MergedTitle);
+                sheet.AddMergedRegion(new CellRangeAddress(firstRow, firstRow, sheet.GetRow(firstRow).FirstCellNum, sheet.GetRow(firstRow).LastCellNum - 1));
+                firstRow++;
+            }
+
+            for (int i = firstRow; i < firstRow + spreadsheet.Datasource.Count; i++)
+            {
+                sheet.CreateRow(i);
+                for (int j = spreadsheet.FirstCell; j < spreadsheet.FirstCell + spreadsheet.Properties.Length; j++)
+                {
+                    sheet.GetRow(i).CreateCell(j).SetCellValue("A");
+                }
+            }
+        }
+
+        private void SetContentTableCellsValue(HSSFSheet sheet, int firstRow, int firstCell, string[] properties, IList<object> values, ChildSheet child)
         {
             int row = firstRow;
             object propValue;
 
-            foreach (var item in values)
+            if (child == null)
             {
-                for (int i = firstCell; i < properties.Length; i++)
+                foreach (var item in values)
                 {
-                    propValue = GetPropValue(item, properties[i]);
-                    switch (SheetUtil.GetCellType(propValue))
+                    for (int i = firstCell; i < properties.Length; i++)
                     {
-                        case HSSFCell.CELL_TYPE_NUMERIC:
-                            sheet.GetRow(row).GetCell(i).SetCellValue(double.Parse(propValue.ToString()));
-                            break;
-                        case HSSFCell.CELL_TYPE_STRING:
-                            sheet.GetRow(row).GetCell(i).SetCellValue(propValue.ToString());
-                            break;
-                        case SheetUtil.CELL_TYPE_DATETIME:
-                            sheet.GetRow(row).GetCell(i).SetCellValue(((DateTime)propValue));
-                            break;
+                        propValue = GetPropValue(item, properties[i]);
+                        switch (SheetUtil.GetCellType(propValue))
+                        {
+                            case HSSFCell.CELL_TYPE_NUMERIC:
+                                sheet.GetRow(row).GetCell(i).SetCellValue(double.Parse(propValue.ToString()));
+                                break;
+                            case HSSFCell.CELL_TYPE_STRING:
+                                sheet.GetRow(row).GetCell(i).SetCellValue(propValue.ToString());
+                                break;
+                            case SheetUtil.CELL_TYPE_DATETIME:
+                                sheet.GetRow(row).GetCell(i).SetCellValue(((DateTime)propValue));
+                                break;
+                        }
                     }
+                    row++;
                 }
-                row++;
             }
+            else
+            {
+                IList<object> data = null;
+                foreach (var item in values)
+                {
+                    child.Datasource = GetListValue(item, child.ChildPropertyName);
+
+                    if (child.Datasource != null)
+                    {
+                        MountSpreadsheet(child);
+                    }
+
+                    for (int i = firstCell; i < properties.Length; i++)
+                    {
+                        propValue = GetPropValue(item, properties[i]);
+                        switch (SheetUtil.GetCellType(propValue))
+                        {
+                            case HSSFCell.CELL_TYPE_NUMERIC:
+                                sheet.GetRow(row).GetCell(i).SetCellValue(double.Parse(propValue.ToString()));
+                                break;
+                            case HSSFCell.CELL_TYPE_STRING:
+                                sheet.GetRow(row).GetCell(i).SetCellValue(propValue.ToString());
+                                break;
+                            case SheetUtil.CELL_TYPE_DATETIME:
+                                sheet.GetRow(row).GetCell(i).SetCellValue(((DateTime)propValue));
+                                break;
+                        }
+                    }
+                    row++;
+
+                }
+            }
+        }
+
+        public static IList<object> GetListValue(object src, string propName)
+        {
+            //TODO: é realmente necessário utilizar uma lista generica de object?
+            Type list = typeof(System.Collections.Generic.IList<object>);
+            string listNamespace = list.Namespace;
+
+            object aux = src;
+            string[] nivels = propName.Split('.');
+
+            object property = null;
+
+            foreach (var nivel in nivels)
+            {
+                property = aux.GetType().GetProperty(nivel).GetValue(aux, null);
+                if (property != null)
+                {
+                    aux = property;
+                }
+            }
+
+            if (property != null && !property.GetType().Namespace.Equals(listNamespace))
+            {
+                //TODO: melhorar a mensagem informando a propriedade
+                throw new ArgumentException("o objeto indicado  não é uma lista");
+            }
+
+            return property as List<object>;
         }
 
         private object GetPropValue(object src, string propName)
         {
-            return src.GetType().GetProperty(propName).GetValue(src, null);
+            //return src.GetType().GetProperty(propName).GetValue(src, null);
+
+            object aux = src;
+            string[] nivels = propName.Split('.');
+            object property = null;
+
+            foreach (var nivel in nivels)
+            {
+                property = aux.GetType().GetProperty(nivel).GetValue(aux, null);
+                if (property != null)
+                {
+                    aux = property;
+                }
+            }
+
+            return property;
         }
 
         private HSSFSheet CreateTitle(string title, string sheetName)
@@ -570,5 +652,6 @@ namespace SpreadsheetFactory
         public int Idade { get; set; }
         public DateTime Nascimento { get; set; }
         public Double Salario { get; set; }
+        public IList<object> Lista { get; set; }
     }
 }
