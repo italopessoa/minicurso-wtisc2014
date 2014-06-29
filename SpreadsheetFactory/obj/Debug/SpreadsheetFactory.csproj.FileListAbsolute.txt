@@ -3,3 +3,4 @@ c:\users\italo.pessoa\documents\visual studio 2013\Projects\SpreadsheetFactory\S
 c:\users\italo.pessoa\documents\visual studio 2013\Projects\SpreadsheetFactory\SpreadsheetFactory\obj\Debug\SpreadsheetFactory.csprojResolveAssemblyReference.cache
 c:\users\italo.pessoa\documents\visual studio 2013\Projects\SpreadsheetFactory\SpreadsheetFactory\obj\Debug\SpreadsheetFactory.dll
 c:\users\italo.pessoa\documents\visual studio 2013\Projects\SpreadsheetFactory\SpreadsheetFactory\obj\Debug\SpreadsheetFactory.pdb
+E:\SVN\WTISC2014\trunk\SpreadsheetFactory\bin\Debug\NPOI.HSSF.xml
