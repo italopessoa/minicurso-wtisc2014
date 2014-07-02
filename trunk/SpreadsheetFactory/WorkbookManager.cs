@@ -110,17 +110,17 @@ namespace SpreadsheetFactory
 
 
                     //TODO:remover comentario
-                    //if (sheet.GetRow(sheet.LastRowNum).IsEmpty())
-                    //{
-                    //    //TODO: corrigir
-                    //    SetContentTableCellsValue(sheet, firstRow - 1, 0, spreadsheetFactory.Properties, spreadsheetFactory.Datasource, spreadsheetFactory.ChildSheet);
-                    //}
-                    //else
-                    //{
-                    //    SetContentTableCellsValue(sheet, firstRow, 0, spreadsheetFactory.Properties, spreadsheetFactory.Datasource, spreadsheetFactory.ChildSheet);
+                    if (sheet.GetRow(sheet.LastRowNum).IsEmpty())
+                    {
+                        //TODO: corrigir
+                        SetContentTableCellsValue(sheet, firstRow - 1, 0, spreadsheetFactory.Properties, spreadsheetFactory.Datasource, spreadsheetFactory.ChildSheet);
+                    }
+                    else
+                    {
+                        SetContentTableCellsValue(sheet, firstRow, 0, spreadsheetFactory.Properties, spreadsheetFactory.Datasource, spreadsheetFactory.ChildSheet);
 
-                    //    //SetContentTableCellsValue(sheet, sheet.LastRowNum+1, 0, spreadsheetFactory.Properties, spreadsheetFactory.Datasource, spreadsheetFactory.ChildSheet);
-                    //}
+                        //SetContentTableCellsValue(sheet, sheet.LastRowNum+1, 0, spreadsheetFactory.Properties, spreadsheetFactory.Datasource, spreadsheetFactory.ChildSheet);
+                    }
 
 
                     //if (spreadsheetFactory.ConditionalFormatList != null)
@@ -434,7 +434,7 @@ namespace SpreadsheetFactory
             }
             else
             {
-                newRow = sheet.LastRowNum;
+                newRow = sheet.LastRowNum + 1;
             }
 
 
@@ -443,7 +443,7 @@ namespace SpreadsheetFactory
             HSSFRow row = null;
             for (int i = firstRow; i < firstRow + spreadsheet.Datasource.Count; i++)
             {
-                row = (String.IsNullOrEmpty(spreadsheet.MergedTitle) ? sheet.CreateRow(sheet.LastRowNum) : sheet.CreateRow(sheet.LastRowNum + 1));
+                row = sheet.CreateRow(sheet.LastRowNum + 1);
                 for (int j = spreadsheet.FirstCell; j < spreadsheet.FirstCell + spreadsheet.Properties.Length; j++)
                 {
                     row.CreateCell(j).SetCellValue("A");
@@ -462,13 +462,11 @@ namespace SpreadsheetFactory
             System.Diagnostics.Debug.WriteLine("FIM: " + sheet.LastRowNum);
         }
 
-        private void SetContentTableCellsValue(HSSFSheet sheet, int firstRow, int firstCell, string[] properties, IList<object> values, ChildSheet child)
+        private int SetContentTableCellsValue(HSSFSheet sheet, int firstRow, int firstCell, string[] properties, IList<object> values, ChildSheet child)
         {
             int row = firstRow;
             object propValue;
 
-            //if (child == null)
-            //{
             foreach (var item in values)
             {
                 for (int i = 0; i < properties.Length; i++)
@@ -488,45 +486,25 @@ namespace SpreadsheetFactory
                     }
                 }
                 row++;
+
+                if (child != null)
+                {
+                    child.Datasource = GetListValue(item, child.ChildPropertyName);
+
+                    if (child.Datasource != null)
+                    {
+                        if (String.IsNullOrEmpty(child.MergedTitle))
+                        {
+                            row = SetContentTableCellsValue(sheet, row, child.FirstCell, child.Properties, child.Datasource, child.ChildSheet);
+                        }
+                        else
+                        {
+                            row = SetContentTableCellsValue(sheet, row + 1, child.FirstCell, child.Properties, child.Datasource, child.ChildSheet);
+                        }
+                    }
+                }
             }
-
-            if (child != null && child.Datasource != null)
-            {
-                SetContentTableCellsValue(sheet, row, child.FirstCell, child.Properties, child.Datasource, child.ChildSheet);
-            }
-            //}
-            //else
-            //{
-            //    IList<object> data = null;
-            //    foreach (var item in values)
-            //    {
-            //        //child.Datasource = GetListValue(item, child.ChildPropertyName);
-
-            //        if (child.Datasource != null)
-            //        {
-            //            MountSpreadsheet(child);
-            //        }
-
-            //        for (int i = firstCell; i < properties.Length; i++)
-            //        {
-            //            propValue = GetPropValue(item, properties[i]);
-            //            switch (SheetUtil.GetCellType(propValue))
-            //            {
-            //                case HSSFCell.CELL_TYPE_NUMERIC:
-            //                    sheet.GetRow(row).GetCell(i).SetCellValue(double.Parse(propValue.ToString()));
-            //                    break;
-            //                case HSSFCell.CELL_TYPE_STRING:
-            //                    sheet.GetRow(row).GetCell(i).SetCellValue(propValue.ToString());
-            //                    break;
-            //                case SheetUtil.CELL_TYPE_DATETIME:
-            //                    sheet.GetRow(row).GetCell(i).SetCellValue(((DateTime)propValue));
-            //                    break;
-            //            }
-            //        }
-            //        row++;
-
-            //    }
-            //}
+            return row;
         }
 
         public static IList<object> GetListValue(object src, string propName)
