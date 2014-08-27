@@ -4,6 +4,7 @@ using NPOI.HSSF.Util;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace SpreadsheetFactory
@@ -113,29 +114,37 @@ namespace SpreadsheetFactory
                     if (sheet.GetRow(sheet.LastRowNum).IsEmpty())
                     {
                         //TODO: corrigir
-                        SetContentTableCellsValue(sheet, firstRow - 1, 0, spreadsheetFactory.Properties, spreadsheetFactory.Datasource, spreadsheetFactory.ChildSheet);
+                        SetContentTableCellsValue(sheet, firstRow - 1, 0, spreadsheetFactory.Properties, spreadsheetFactory.Datasource, spreadsheetFactory.ChildSheet, spreadsheetFactory.MergedTitle);
                     }
                     else
                     {
-                        SetContentTableCellsValue(sheet, firstRow, 0, spreadsheetFactory.Properties, spreadsheetFactory.Datasource, spreadsheetFactory.ChildSheet);
-
+                        SetContentTableCellsValue(sheet, firstRow, 0, spreadsheetFactory.Properties, spreadsheetFactory.Datasource, spreadsheetFactory.ChildSheet, spreadsheetFactory.MergedTitle);
                         //SetContentTableCellsValue(sheet, sheet.LastRowNum+1, 0, spreadsheetFactory.Properties, spreadsheetFactory.Datasource, spreadsheetFactory.ChildSheet);
                     }
 
 
-                    //if (spreadsheetFactory.ConditionalFormatList != null)
-                    //{
-                    //    List<PropertyCell> teste = new List<PropertyCell>();
-                    //    for (int i = 0; i < spreadsheetFactory.Properties.Length; i++)
-                    //    {
-                    //        if (spreadsheetFactory.ConditionalFormatList.Keys.Contains(spreadsheetFactory.Properties[i]))
-                    //        {
-                    //            teste.Add(new PropertyCell() { CellIndex = i, PropertyName = spreadsheetFactory.Properties[i] });
-                    //        }
-                    //    }
+                    if (spreadsheetFactory.ConditionalFormatList != null)
+                    {
+                        List<PropertyCell> teste = new List<PropertyCell>();
+                        for (int i = 0; i < spreadsheetFactory.Properties.Length; i++)
+                        {
+                            if (spreadsheetFactory.ConditionalFormatList.Keys.Contains(spreadsheetFactory.Properties[i]))
+                            {
+                                teste.Add(new PropertyCell() { CellIndex = i, PropertyName = spreadsheetFactory.Properties[i] });
+                            }
+                        }
 
-                    //    ApplyConditinalFormattingContentTable(sheet, firstRow, spreadsheetFactory.Datasource.Count, 0, spreadsheetFactory.Properties.Length + 0, teste, spreadsheetFactory.RowStyle, spreadsheetFactory.ConditionalFormatList);
-                    //}
+                        ApplyConditinalFormattingContentTable(sheet, firstRow, spreadsheetFactory.Datasource.Count, 0, spreadsheetFactory.Properties.Length + 0, teste, spreadsheetFactory.RowStyle, spreadsheetFactory.ConditionalFormatList);
+
+                        ChildSheet child = spreadsheetFactory.ChildSheet;
+
+                        //TODO: implementar o laço para cada child
+                        while (child != null)
+                        {
+                            ApplyConditinalFormattingContentTable(sheet, firstRow + 2, child.Datasource.Count, child.FirstCell, child.Properties.Length + 0, teste, child.RowStyle, child.ConditionalFormatList);
+                        }
+
+                    }
 
 
                     //if (!String.IsNullOrEmpty(spreadsheetFactory.MergedTitle))
@@ -416,25 +425,50 @@ namespace SpreadsheetFactory
             }
         }
 
+        /// <summary>
+        /// Criar ccelular para armazenar valores das tabelas de dados
+        /// </summary>
+        /// <param name="sheet"></param>
+        /// <param name="spreadsheet"></param>
+        /// <param name="firstRow"></param>
         private void CreateContentTableCells(HSSFSheet sheet, SpreadsheetFactory spreadsheet, int firstRow)
         {
             System.Diagnostics.Debug.WriteLine("INICIO: " + firstRow);
-            int newRow = 0;
+            //int newRow = 0;
             if (!String.IsNullOrEmpty(spreadsheet.MergedTitle))
             {
-                sheet.CreateRow(firstRow);
+                //sheet.CreateRow(firstRow);
+                //TODO: solucao temporaria, as linha deve ser criada antes da execucao
+                HSSFRow rowTemp = sheet.GetRow(firstRow);
+                if (rowTemp == null)
+                {
+                    rowTemp = sheet.CreateRow(firstRow);
+                }
                 for (int j = spreadsheet.FirstCell; j < spreadsheet.FirstCell + spreadsheet.Properties.Length; j++)
                 {
-                    sheet.GetRow(firstRow).CreateCell(j);
+                    rowTemp.CreateCell(j);
                 }
-                sheet.GetRow(firstRow).GetCell(spreadsheet.FirstCell).SetCellValue(spreadsheet.MergedTitle);
-                sheet.AddMergedRegion(new CellRangeAddress(firstRow, firstRow, sheet.GetRow(firstRow).FirstCellNum, sheet.GetRow(firstRow).LastCellNum - 1));
+                
+
+                HSSFRow actualRow = sheet.GetRow(firstRow);
+                actualRow.GetCell(spreadsheet.FirstCell).SetCellValue(spreadsheet.MergedTitle);
+
+                sheet.AddMergedRegion(new CellRangeAddress(firstRow, firstRow, actualRow.FirstCellNum, actualRow.LastCellNum - 1));
+
+                if (spreadsheet.SpanTitleStyle != null)
+                {
+                    for (int j = spreadsheet.FirstCell; j < spreadsheet.FirstCell + spreadsheet.Properties.Length; j++)
+                    {
+                        actualRow.GetCell(j).CellStyle = spreadsheet.SpanTitleStyle;
+                    }
+                }
+
                 firstRow++;
-                newRow = sheet.LastRowNum + 1;
+                //newRow = sheet.LastRowNum + 1;
             }
             else
             {
-                newRow = sheet.LastRowNum + 1;
+                //newRow = sheet.LastRowNum + 1;
             }
 
 
@@ -443,7 +477,14 @@ namespace SpreadsheetFactory
             HSSFRow row = null;
             for (int i = firstRow; i < firstRow + spreadsheet.Datasource.Count; i++)
             {
-                row = sheet.CreateRow(sheet.LastRowNum + 1);
+                if (String.IsNullOrEmpty(spreadsheet.MergedTitle))
+                {
+                    row = sheet.CreateRow(sheet.LastRowNum);
+                }
+                else
+                {
+                    row = sheet.CreateRow(sheet.LastRowNum + 1);
+                }
                 for (int j = spreadsheet.FirstCell; j < spreadsheet.FirstCell + spreadsheet.Properties.Length; j++)
                 {
                     row.CreateCell(j).SetCellValue("A");
@@ -462,13 +503,27 @@ namespace SpreadsheetFactory
             System.Diagnostics.Debug.WriteLine("FIM: " + sheet.LastRowNum);
         }
 
-        private int SetContentTableCellsValue(HSSFSheet sheet, int firstRow, int firstCell, string[] properties, IList<object> values, ChildSheet child)
+        private int SetContentTableCellsValue(HSSFSheet sheet, int firstRow, int firstCell, string[] properties, IList<object> values, ChildSheet child, [Optional] string mergedTitle)
         {
             int row = firstRow;
             object propValue;
 
+            //adicionada a negação/ a verificação é feita apenas uma vez
+            //NOA FOI MAIS NECESSARIA ESSA VERIFICACAO
+            //if (!String.IsNullOrEmpty(mergedTitle))
+            //{
+            //    row++;
+            //}
+
             foreach (var item in values)
             {
+                //verificar se a linha está no limite
+                //VERIFICACAO NAOS MAIS NECESSARIA
+                //if (sheet.LastRowNum < row)
+                //{
+                //    return row + 1;
+                //}
+
                 for (int i = 0; i < properties.Length; i++)
                 {
                     propValue = GetPropValue(item, properties[i]);
@@ -485,6 +540,7 @@ namespace SpreadsheetFactory
                             break;
                     }
                 }
+
                 row++;
 
                 if (child != null)
@@ -504,6 +560,7 @@ namespace SpreadsheetFactory
                     }
                 }
             }
+
             return row;
         }
 
@@ -530,7 +587,7 @@ namespace SpreadsheetFactory
             if (property != null && !property.GetType().Namespace.Equals(listNamespace))
             {
                 //TODO: melhorar a mensagem informando a propriedade
-                throw new ArgumentException("o objeto indicado  não é uma lista");
+                throw new ArgumentException("O objeto informado não é uma lista: \"" + propName + "\"");
             }
 
             return property as List<object>;

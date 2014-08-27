@@ -69,12 +69,12 @@ namespace SpreadsheetFactory
 
         private IDictionary<string, List<ConditionalFormattingTemplate>> _conditionalFormatDictionary;
 
-        public IDictionary<string, List<ConditionalFormattingTemplate>> ConditionalFormatList
+        public virtual IDictionary<string, List<ConditionalFormattingTemplate>> ConditionalFormatList
         {
             get { return _conditionalFormatDictionary; }
         }
 
-        public void AddConditionalFormatting(string property, ConditionalFormattingTemplate format)
+        public virtual void AddConditionalFormatting(string property, ConditionalFormattingTemplate format)
         {
             if (_conditionalFormatDictionary == null)
             {
@@ -112,7 +112,13 @@ namespace SpreadsheetFactory
             get { return _firstCell; }
             set { _firstCell =  value; }
         }
-        
-        
+
+        private NPOI.HSSF.UserModel.HSSFCellStyle _spanTitleStyle;
+
+        public NPOI.HSSF.UserModel.HSSFCellStyle SpanTitleStyle
+        {
+            get { return _spanTitleStyle; }
+            set {  _spanTitleStyle = value; }
+        }
     }
 }
