@@ -17,6 +17,16 @@ namespace SpreadsheetFactory.Test
             WorkbookManager WorkbookManager = new global::SpreadsheetFactory.WorkbookManager();
 
             SpreadsheetFactory spf1 = GerarExemplo(WorkbookManager);
+            spf1.MergedTitle = "merged title";
+            HSSFCellStyle aas = WorkbookManager.GetNewHSSFCellStyle();
+            aas.BorderTop = 1;
+            aas.BorderRight = 1;
+            aas.BorderRight = 1;
+            aas.BorderBottom = 1;
+            aas.FillPattern = HSSFCellStyle.SOLID_FOREGROUND;
+            aas.FillForegroundColor = HSSFColor.CORAL.index;
+            spf1.SpanTitleStyle = aas;
+
             SpreadsheetFactory spf2 = GerarExemploSemHeader(WorkbookManager);
             ChildSheet filho = GerarDetalheSemHeader(WorkbookManager);
             filho.FirstCell = 1;
@@ -37,34 +47,80 @@ namespace SpreadsheetFactory.Test
             SpreadsheetFactory teste = new SpreadsheetFactory();
             teste.SpreadsheetFactoryList = new List<SpreadsheetFactory>();
             spf1.Name = "teste 1";
-            spf1.MergedTitle = "titulo";
+            //spf1.MergedTitle = "titulo";
+            
+            //seta o objeto que conterá os detalhes
             spf1.ChildSheet = filho;
-            spf1.ChildSheet.MergedTitle = "TESTANDO";
+            //titulo com span
+            spf1.ChildSheet.MergedTitle = "Primeiro span";
+
+            //nascimento == "02/02/2013";
+            #region linha Amarela
+
+
+            HSSFCellStyle celulaAmarela0 = WorkbookManager.GetNewHSSFCellStyle();
+            celulaAmarela0.BorderTop = 1;
+            celulaAmarela0.BorderRight = 1;
+            celulaAmarela0.BorderRight = 1;
+            celulaAmarela0.BorderBottom = 1;
+
+            HSSFCellStyle celulaAmarela1 = WorkbookManager.GetNewHSSFCellStyle();
+            celulaAmarela1.BorderTop = 1;
+            celulaAmarela1.BorderRight = 1;
+            celulaAmarela1.BorderRight = 1;
+            celulaAmarela1.BorderBottom = 1;
+
+            RowStyle linhaAmarela = new RowStyle();
+            linhaAmarela.RowStyleName = "linha amarela2";
+            linhaAmarela.RowFillPattern = HSSFCellStyle.SOLID_FOREGROUND;
+            linhaAmarela.RowForegroundColor = HSSFColor.PINK.index;
+
+            linhaAmarela.AddCellRowStyle(0, celulaAmarela0);
+            linhaAmarela.AddCellRowStyle(1, celulaAmarela1);
+            linhaAmarela.AddCellRowStyle(2, celulaAmarela1);
+            linhaAmarela.AddCellRowStyle(3, celulaAmarela1);
+
+            ConditionalFormattingTemplate templateAmarela = new ConditionalFormattingTemplate();
+            templateAmarela.Priority = 14;
+            templateAmarela.ComparisonOperator = NPOI.HSSF.Record.ComparisonOperator.EQUAL;
+            templateAmarela.PropertyName = "Nascimento";
+            templateAmarela.Value = new DateTime(2013, 2, 2);//"02/02/2013";
+            templateAmarela.RowStyle = linhaAmarela;
+            spf1.ChildSheet.AddConditionalFormatting("Nascimento", templateAmarela);
+
+
+            #endregion linha amarela
+
+
+            //sheet que conterá os valores (usar a mesma da tabela pai)
             spf1.ChildSheet.Name = "teste 1";
+
+
+            HSSFCellStyle aas2 = WorkbookManager.GetNewHSSFCellStyle();
+            aas2.BorderTop = 1;
+            aas2.BorderRight = 1;
+            aas2.BorderRight = 1;
+            aas2.BorderBottom = 1;
+            aas2.FillPattern = HSSFCellStyle.SOLID_FOREGROUND;
+            aas2.FillForegroundColor = HSSFColor.CORNFLOWER_BLUE.index;
+            spf1.ChildSheet.SpanTitleStyle = aas2;
             teste.SpreadsheetFactoryList.Add(spf1);
 
+            //seta o objeto que conterá os detalhes
             spf1.ChildSheet.ChildSheet = GerarDetalheSemHeader(WorkbookManager);
-            spf1.ChildSheet.ChildSheet.MergedTitle = "3 NIVEL";
+            //titulo com span
+            spf1.ChildSheet.ChildSheet.MergedTitle = "Segundo espan -  3 NIVEL";
             spf1.ChildSheet.ChildSheet.FirstCell = 2;
+            //sheet que conterá os valores (usar a mesma da tabela pai)
             spf1.ChildSheet.ChildSheet.Name = "teste 1";
 
-
             spf2.Name = "teste 1";
-            spf2.MergedTitle = "titulo 1";
+            spf2.MergedTitle = "segunda tabela";
             teste.SpreadsheetFactoryList.Add(spf2);
 
             #endregion
 
-
-
-
-
-
-
-
             //spf1.ChildSheet.Datasource = list;
-            
-                
            // teste.SpreadsheetFactoryList.Add(spf1);
 
             WorkbookManager.MountSpreadsheet(teste);
@@ -419,6 +475,7 @@ namespace SpreadsheetFactory.Test
             celulaAzul1.BorderRight = 1;
             celulaAzul1.BorderRight = 1;
             celulaAzul1.BorderBottom = 1;
+            celulaAzul1.Alignment = HSSFCellStyle.ALIGN_CENTER;
             celulaAzul1.DataFormat = dateFormatIndex;
 
             HSSFCellStyle celulaAzul2 = WorkbookManager.GetNewHSSFCellStyle();
@@ -457,7 +514,6 @@ namespace SpreadsheetFactory.Test
 
             //idade == 1
             #region linha verde
-
 
             HSSFCellStyle celulaVerde0 = WorkbookManager.GetNewHSSFCellStyle();
             celulaVerde0.BorderTop = 1;
@@ -597,7 +653,6 @@ namespace SpreadsheetFactory.Test
             contentStyle.FillPattern = HSSFCellStyle.SOLID_FOREGROUND;
             contentStyle.FillForegroundColor = HSSFColor.YELLOW.index;
 
-
             //salario == 2
             #region linhaVermelha
 
@@ -713,6 +768,7 @@ namespace SpreadsheetFactory.Test
             celulaVerde1.BorderRight = 1;
             celulaVerde1.BorderRight = 1;
             celulaVerde1.BorderBottom = 1;
+            celulaVerde1.Alignment = HSSFCellStyle.ALIGN_CENTER;
             celulaVerde1.DataFormat = dateFormatIndex;
 
             HSSFCellStyle celulaVerde2 = WorkbookManager.GetNewHSSFCellStyle();
@@ -739,7 +795,7 @@ namespace SpreadsheetFactory.Test
             linhaVerde.AddCellRowStyle(3, celulaVerde3);
 
             ConditionalFormattingTemplate templateVerde = new ConditionalFormattingTemplate();
-            templateVerde.Priority = 13;
+            templateVerde.Priority = 15;
             templateVerde.ComparisonOperator = NPOI.HSSF.Record.ComparisonOperator.EQUAL;
             templateVerde.PropertyName = "Idade";
             templateVerde.Value = 1;
@@ -801,7 +857,6 @@ namespace SpreadsheetFactory.Test
             #endregion linha amarela
 
             RowStyle rs = new RowStyle();
-
 
             spf.FirstHeaderCell = 0;
             spf.RowStyle = rs;
@@ -817,7 +872,7 @@ namespace SpreadsheetFactory.Test
 
             string[] properties = new string[2];
             properties[0] = "Idade";
-            properties[1] = "Nascimento";
+            properties[1] = "Salario";
 
             spf.Properties = properties;
 
@@ -828,7 +883,6 @@ namespace SpreadsheetFactory.Test
             contentStyle.BorderBottom = 1;
             contentStyle.FillPattern = HSSFCellStyle.SOLID_FOREGROUND;
             contentStyle.FillForegroundColor = HSSFColor.YELLOW.index;
-
 
             //salario == 2
             #region linhaVermelha
@@ -1033,8 +1087,7 @@ namespace SpreadsheetFactory.Test
             #endregion linha amarela
 
             RowStyle rs = new RowStyle();
-
-
+            
             spf.FirstHeaderCell = 0;
             spf.RowStyle = rs;
             return spf;
@@ -1083,7 +1136,6 @@ namespace SpreadsheetFactory.Test
             ConditionalFormattingTemplate de = new ConditionalFormattingTemplate();
 
         }
-
 
         static void Maiwn(string[] args)
         {
@@ -1142,7 +1194,5 @@ namespace SpreadsheetFactory.Test
             public A MyPropertyA { get; set; }
         }
     }
-
-
 }
 
