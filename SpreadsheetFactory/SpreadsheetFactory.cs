@@ -65,7 +65,7 @@ namespace SpreadsheetFactory
 
         public NPOI.HSSF.UserModel.HSSFCellStyle HeaderCellStyle { get; set; }
 
-        public RowStyle RowStyle { get; set; }
+        public virtual RowStyle RowStyle { get; set; }
 
         private IDictionary<string, List<ConditionalFormattingTemplate>> _conditionalFormatDictionary;
 

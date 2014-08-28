@@ -28,7 +28,7 @@ namespace SpreadsheetFactory.Test
             spf1.SpanTitleStyle = aas;
 
             SpreadsheetFactory spf2 = GerarExemploSemHeader(WorkbookManager);
-            ChildSheet filho = GerarDetalheSemHeader(WorkbookManager);
+            ChildSheet filho = GerarDetalheSemHeaderChild(WorkbookManager);
             filho.FirstCell = 1;
             #region padrao
             //SpreadsheetFactory teste = new SpreadsheetFactory();
@@ -77,8 +77,8 @@ namespace SpreadsheetFactory.Test
 
             linhaAmarela.AddCellRowStyle(0, celulaAmarela0);
             linhaAmarela.AddCellRowStyle(1, celulaAmarela1);
-            linhaAmarela.AddCellRowStyle(2, celulaAmarela1);
-            linhaAmarela.AddCellRowStyle(3, celulaAmarela1);
+            //linhaAmarela.AddCellRowStyle(2, celulaAmarela1);
+            //linhaAmarela.AddCellRowStyle(3, celulaAmarela1);
 
             ConditionalFormattingTemplate templateAmarela = new ConditionalFormattingTemplate();
             templateAmarela.Priority = 14;
@@ -95,11 +95,10 @@ namespace SpreadsheetFactory.Test
             //sheet que conterá os valores (usar a mesma da tabela pai)
             spf1.ChildSheet.Name = "teste 1";
 
-
             HSSFCellStyle aas2 = WorkbookManager.GetNewHSSFCellStyle();
             aas2.BorderTop = 1;
             aas2.BorderRight = 1;
-            aas2.BorderRight = 1;
+            aas2.BorderLeft = 1;
             aas2.BorderBottom = 1;
             aas2.FillPattern = HSSFCellStyle.SOLID_FOREGROUND;
             aas2.FillForegroundColor = HSSFColor.CORNFLOWER_BLUE.index;
@@ -111,6 +110,16 @@ namespace SpreadsheetFactory.Test
             //titulo com span
             spf1.ChildSheet.ChildSheet.MergedTitle = "Segundo espan -  3 NIVEL";
             spf1.ChildSheet.ChildSheet.FirstCell = 2;
+
+            HSSFCellStyle aas3 = WorkbookManager.GetNewHSSFCellStyle();
+            aas3.BorderTop = 1;
+            aas3.BorderRight = 1;
+            aas3.BorderLeft = 1;
+            aas3.BorderBottom = 1;
+            aas3.FillPattern = HSSFCellStyle.SOLID_FOREGROUND;
+            aas3.FillForegroundColor = HSSFColor.LIME.index;
+            spf1.ChildSheet.ChildSheet.SpanTitleStyle = aas3;
+
             //sheet que conterá os valores (usar a mesma da tabela pai)
             spf1.ChildSheet.ChildSheet.Name = "teste 1";
 
@@ -863,6 +872,229 @@ namespace SpreadsheetFactory.Test
             return spf;
         }
 
+
+        static ChildSheet GerarDetalheSemHeaderChild(WorkbookManager WorkbookManager)
+        {
+            ChildSheet spf = new ChildSheet("Lista");
+
+            HSSFDataFormat dateFormat = WorkbookManager.GetNewHSSFDataFormat();
+            short dateFormatIndex = dateFormat.GetFormat("DD/MM/YYYY");
+
+            string[] properties = new string[2];
+            properties[0] = "Idade";
+            properties[1] = "Salario";
+
+            spf.Properties = properties;
+
+            HSSFCellStyle contentStyle = WorkbookManager.GetNewHSSFCellStyle();
+            contentStyle.BorderTop = 1;
+            contentStyle.BorderRight = 1;
+            contentStyle.BorderRight = 1;
+            contentStyle.BorderBottom = 1;
+            contentStyle.FillPattern = HSSFCellStyle.SOLID_FOREGROUND;
+            contentStyle.FillForegroundColor = HSSFColor.YELLOW.index;
+
+            //salario == 2
+            #region linhaVermelha
+
+            HSSFCellStyle celulaVermelha0 = WorkbookManager.GetNewHSSFCellStyle();
+            celulaVermelha0.BorderTop = 1;
+            celulaVermelha0.BorderRight = 1;
+            celulaVermelha0.BorderRight = 1;
+            celulaVermelha0.BorderBottom = 1;
+
+            HSSFCellStyle celulaVermelha1 = WorkbookManager.GetNewHSSFCellStyle();
+            celulaVermelha1.BorderTop = 1;
+            celulaVermelha1.BorderRight = 1;
+            celulaVermelha1.BorderRight = 1;
+            celulaVermelha1.BorderBottom = 1;
+            celulaVermelha1.DataFormat = dateFormatIndex;
+
+            HSSFCellStyle celulaVermelha2 = WorkbookManager.GetNewHSSFCellStyle();
+            celulaVermelha2.BorderTop = 1;
+            celulaVermelha2.BorderRight = 1;
+            celulaVermelha2.BorderRight = 1;
+            celulaVermelha2.BorderBottom = 1;
+            celulaVermelha2.Alignment = HSSFCellStyle.ALIGN_CENTER;
+
+            HSSFCellStyle celulaVermelha3 = WorkbookManager.GetNewHSSFCellStyle();
+            celulaVermelha3.BorderTop = 1;
+            celulaVermelha3.BorderRight = 1;
+            celulaVermelha3.BorderRight = 1;
+            celulaVermelha3.BorderBottom = 1;
+
+            RowStyle linhaVermelha = new RowStyle();
+            linhaVermelha.RowStyleName = "linha coral";
+            linhaVermelha.RowFillPattern = HSSFCellStyle.SOLID_FOREGROUND;
+            linhaVermelha.RowForegroundColor = HSSFColor.RED.index;
+
+            linhaVermelha.AddCellRowStyle(0, celulaVermelha0);
+            linhaVermelha.AddCellRowStyle(1, celulaVermelha1);
+
+            ConditionalFormattingTemplate template = new ConditionalFormattingTemplate();
+            template.Priority = 1;
+            template.ComparisonOperator = NPOI.HSSF.Record.ComparisonOperator.EQUAL;
+            template.PropertyName = "Salario";
+            template.Value = 2;
+            template.RowStyle = linhaVermelha;
+            spf.AddConditionalFormatting("Salario", template);
+
+            #endregion linhaVermelha
+
+            //salario > 2
+            #region linha azul
+
+
+            HSSFCellStyle celulaAzul0 = WorkbookManager.GetNewHSSFCellStyle();
+            celulaAzul0.BorderTop = 1;
+            celulaAzul0.BorderRight = 1;
+            celulaAzul0.BorderRight = 1;
+            celulaAzul0.BorderBottom = 1;
+
+            HSSFCellStyle celulaAzul1 = WorkbookManager.GetNewHSSFCellStyle();
+            celulaAzul1.BorderTop = 1;
+            celulaAzul1.BorderRight = 1;
+            celulaAzul1.BorderRight = 1;
+            celulaAzul1.BorderBottom = 1;
+            celulaAzul1.DataFormat = dateFormatIndex;
+
+            HSSFCellStyle celulaAzul2 = WorkbookManager.GetNewHSSFCellStyle();
+            celulaAzul2.BorderTop = 1;
+            celulaAzul2.BorderRight = 1;
+            celulaAzul2.BorderRight = 1;
+            celulaAzul2.BorderBottom = 1;
+            celulaAzul2.Alignment = HSSFCellStyle.ALIGN_CENTER;
+
+            HSSFCellStyle celulaAzul3 = WorkbookManager.GetNewHSSFCellStyle();
+            celulaAzul3.BorderTop = 1;
+            celulaAzul3.BorderRight = 1;
+            celulaAzul3.BorderRight = 1;
+            celulaAzul3.BorderBottom = 1;
+
+            RowStyle linhaAzul = new RowStyle();
+            linhaAzul.RowStyleName = "linha coral";
+            linhaAzul.RowFillPattern = HSSFCellStyle.SOLID_FOREGROUND;
+            linhaAzul.RowForegroundColor = HSSFColor.BLUE.index;
+
+            linhaAzul.AddCellRowStyle(0, celulaAzul0);
+            linhaAzul.AddCellRowStyle(1, celulaAzul1);
+
+            ConditionalFormattingTemplate templateAzul = new ConditionalFormattingTemplate();
+            templateAzul.Priority = 3;
+            templateAzul.ComparisonOperator = NPOI.HSSF.Record.ComparisonOperator.GT;
+            templateAzul.PropertyName = "Salario";
+            templateAzul.Value = 2;
+            templateAzul.RowStyle = linhaAzul;
+            spf.AddConditionalFormatting("Salario", templateAzul);
+
+
+            #endregion linha azul
+
+            //idade == 1
+            #region linha verde
+
+
+            HSSFCellStyle celulaVerde0 = WorkbookManager.GetNewHSSFCellStyle();
+            celulaVerde0.BorderTop = 1;
+            celulaVerde0.BorderRight = 1;
+            celulaVerde0.BorderRight = 1;
+            celulaVerde0.BorderBottom = 1;
+
+            HSSFCellStyle celulaVerde1 = WorkbookManager.GetNewHSSFCellStyle();
+            celulaVerde1.BorderTop = 1;
+            celulaVerde1.BorderRight = 1;
+            celulaVerde1.BorderRight = 1;
+            celulaVerde1.BorderBottom = 1;
+            celulaVerde1.DataFormat = dateFormatIndex;
+
+            HSSFCellStyle celulaVerde2 = WorkbookManager.GetNewHSSFCellStyle();
+            celulaVerde2.BorderTop = 1;
+            celulaVerde2.BorderRight = 1;
+            celulaVerde2.BorderRight = 1;
+            celulaVerde2.BorderBottom = 1;
+            celulaVerde2.Alignment = HSSFCellStyle.ALIGN_CENTER;
+
+            HSSFCellStyle celulaVerde3 = WorkbookManager.GetNewHSSFCellStyle();
+            celulaVerde3.BorderTop = 1;
+            celulaVerde3.BorderRight = 1;
+            celulaVerde3.BorderRight = 1;
+            celulaVerde3.BorderBottom = 1;
+
+            RowStyle linhaVerde = new RowStyle();
+            linhaVerde.RowStyleName = "linha coral";
+            linhaVerde.RowFillPattern = HSSFCellStyle.SOLID_FOREGROUND;
+            linhaVerde.RowForegroundColor = HSSFColor.GREEN.index;
+
+            linhaVerde.AddCellRowStyle(0, celulaVerde0);
+            linhaVerde.AddCellRowStyle(1, celulaVerde1);
+
+            ConditionalFormattingTemplate templateVerde = new ConditionalFormattingTemplate();
+            templateVerde.Priority = 13;
+            templateVerde.ComparisonOperator = NPOI.HSSF.Record.ComparisonOperator.EQUAL;
+            templateVerde.PropertyName = "Idade";
+            templateVerde.Value = 1;
+            templateVerde.RowStyle = linhaVerde;
+            spf.AddConditionalFormatting("Idade", templateVerde);
+
+
+            #endregion linha verde
+
+            //nascimento == "02/02/2013";
+            #region linha Amarela
+
+
+            HSSFCellStyle celulaAmarela0 = WorkbookManager.GetNewHSSFCellStyle();
+            celulaAmarela0.BorderTop = 1;
+            celulaAmarela0.BorderRight = 1;
+            celulaAmarela0.BorderRight = 1;
+            celulaAmarela0.BorderBottom = 1;
+
+            HSSFCellStyle celulaAmarela1 = WorkbookManager.GetNewHSSFCellStyle();
+            celulaAmarela1.BorderTop = 1;
+            celulaAmarela1.BorderRight = 1;
+            celulaAmarela1.BorderRight = 1;
+            celulaAmarela1.BorderBottom = 1;
+            celulaAmarela1.DataFormat = dateFormatIndex;
+
+            HSSFCellStyle celulaAmarela2 = WorkbookManager.GetNewHSSFCellStyle();
+            celulaAmarela2.BorderTop = 1;
+            celulaAmarela2.BorderRight = 1;
+            celulaAmarela2.BorderRight = 1;
+            celulaAmarela2.BorderBottom = 1;
+            celulaAmarela2.Alignment = HSSFCellStyle.ALIGN_CENTER;
+
+            HSSFCellStyle celulaAmarela3 = WorkbookManager.GetNewHSSFCellStyle();
+            celulaAmarela3.BorderTop = 1;
+            celulaAmarela3.BorderRight = 1;
+            celulaAmarela3.BorderRight = 1;
+            celulaAmarela3.BorderBottom = 1;
+
+            RowStyle linhaAmarela = new RowStyle();
+            linhaAmarela.RowStyleName = "linha amarela";
+            linhaAmarela.RowFillPattern = HSSFCellStyle.SOLID_FOREGROUND;
+            linhaAmarela.RowForegroundColor = HSSFColor.YELLOW.index;
+
+            linhaAmarela.AddCellRowStyle(0, celulaAmarela0);
+            linhaAmarela.AddCellRowStyle(1, celulaAmarela1);
+
+            ConditionalFormattingTemplate templateAmarela = new ConditionalFormattingTemplate();
+            templateAmarela.Priority = 14;
+            templateAmarela.ComparisonOperator = NPOI.HSSF.Record.ComparisonOperator.EQUAL;
+            templateAmarela.PropertyName = "Nascimento";
+            templateAmarela.Value = new DateTime(2013, 2, 2);//"02/02/2013";
+            templateAmarela.RowStyle = linhaAmarela;
+            //spf.AddConditionalFormatting("Nascimento", templateAmarela);
+
+
+            #endregion linha amarela
+
+            RowStyle rs = new RowStyle();
+
+            spf.FirstHeaderCell = 0;
+            spf.RowStyle = rs;
+            return spf;
+        }
+
         static ChildSheet GerarDetalheSemHeader(WorkbookManager WorkbookManager)
         {
             ChildSheet spf = new ChildSheet("Lista");
@@ -1081,7 +1313,7 @@ namespace SpreadsheetFactory.Test
             templateAmarela.PropertyName = "Nascimento";
             templateAmarela.Value = new DateTime(2013, 2, 2);//"02/02/2013";
             templateAmarela.RowStyle = linhaAmarela;
-            spf.AddConditionalFormatting("Nascimento", templateAmarela);
+            //spf.AddConditionalFormatting("Nascimento", templateAmarela);
 
 
             #endregion linha amarela

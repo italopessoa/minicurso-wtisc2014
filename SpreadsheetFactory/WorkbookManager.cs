@@ -125,27 +125,21 @@ namespace SpreadsheetFactory
 
                     if (spreadsheetFactory.ConditionalFormatList != null)
                     {
-                        List<PropertyCell> teste = new List<PropertyCell>();
-                        for (int i = 0; i < spreadsheetFactory.Properties.Length; i++)
-                        {
-                            if (spreadsheetFactory.ConditionalFormatList.Keys.Contains(spreadsheetFactory.Properties[i]))
-                            {
-                                teste.Add(new PropertyCell() { CellIndex = i, PropertyName = spreadsheetFactory.Properties[i] });
-                            }
-                        }
+                        List<PropertyCell> teste = GetPropertiesCells(spreadsheetFactory);
 
                         ApplyConditinalFormattingContentTable(sheet, firstRow, spreadsheetFactory.Datasource.Count, 0, spreadsheetFactory.Properties.Length + 0, teste, spreadsheetFactory.RowStyle, spreadsheetFactory.ConditionalFormatList);
 
                         ChildSheet child = spreadsheetFactory.ChildSheet;
 
                         //TODO: implementar o laço para cada child
-                        while (child != null)
+                        /*while (child != null)
                         {
+                            teste = GetPropertiesCells(child);
                             ApplyConditinalFormattingContentTable(sheet, firstRow + 2, child.Datasource.Count, child.FirstCell, child.Properties.Length + 0, teste, child.RowStyle, child.ConditionalFormatList);
-                        }
+                            child = child.ChildSheet;
+                        }*/
 
                     }
-
 
                     //if (!String.IsNullOrEmpty(spreadsheetFactory.MergedTitle))
                     //{
@@ -161,6 +155,43 @@ namespace SpreadsheetFactory
                     //}
                 }
             }
+        }
+
+        private int Teste(ChildSheet child)
+        {
+         //child.MergedTitle   se tiver titulo, pula uma linha
+
+            List<PropertyCell> teste = GetPropertiesCells(child);
+
+            //for (int r = firstRow; r < (firstRow + rows); r++)
+            //{
+            //    RowStyle style = GetRowStyle(sheet.GetRow(r), cellPoints, conditionalFormatList);
+
+            //    if (style != null)
+            //    {
+            //        ApplyRowStyle(sheet.GetRow(r), style);
+            //    }
+            //    else
+            //    {
+            //        ApplyRowStyle(sheet.GetRow(r), defaultContentRowStyle);
+            //    }
+            //}
+
+            return int.MinValue;
+
+        }
+
+        private List<PropertyCell> GetPropertiesCells(SpreadsheetFactory spreadsheetFactory)
+        {
+            List<PropertyCell> teste = new List<PropertyCell>();
+            for (int i = 0; i < spreadsheetFactory.Properties.Length; i++)
+            {
+                if (spreadsheetFactory.ConditionalFormatList.Keys.Contains(spreadsheetFactory.Properties[i]))
+                {
+                    teste.Add(new PropertyCell() { CellIndex = i+spreadsheetFactory.FirstCell, PropertyName = spreadsheetFactory.Properties[i] });
+                }
+            }
+            return teste;
         }
 
         #endregion Public Methods
