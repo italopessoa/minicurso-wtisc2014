@@ -47,6 +47,7 @@ namespace SpreadsheetFactory
             }
         }
 
+        //public override RowStyle RowStyle { get; set; }
 
     }
 }
